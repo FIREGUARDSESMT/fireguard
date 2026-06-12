@@ -447,6 +447,25 @@ button[title]:hover::before{content:'';position:absolute;bottom:calc(100% + 1px)
   .main{padding:12px;padding-top:60px;padding-bottom:calc(76px + env(safe-area-inset-bottom));}
 }
 
+/* ── BRIGADA ── */
+.brig-foto{width:36px;height:36px;border-radius:50%;object-fit:cover;display:block;border:1px solid var(--border);}
+.brig-iniciais{width:36px;height:36px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;}
+.foto-upload{width:88px;height:88px;border-radius:50%;border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;background:var(--surface);font-size:28px;transition:border-color .2s;flex-shrink:0;}
+.foto-upload:hover{border-color:var(--accent);}
+.foto-upload img{width:100%;height:100%;object-fit:cover;}
+.trein-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:8px;}
+.trein-hist{opacity:.55;}
+.org-node{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:10px 14px;display:flex;align-items:center;gap:10px;min-width:200px;max-width:250px;}
+.org-node.nivel-top{border-color:rgba(255,77,28,.5);}
+.org-node.nivel-lider{border-color:rgba(59,130,246,.4);}
+.org-node-sm{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:7px 10px;display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.org-vline{width:2px;background:var(--border);margin:0 auto;}
+.org-nome{font-size:13px;font-weight:700;line-height:1.2;}
+.org-funcao{font-size:9px;font-weight:600;letter-spacing:.4px;}
+.org-sub{font-size:10px;color:var(--muted);}
+.org-grupo{flex:1;min-width:230px;max-width:280px;}
+.org-filhos{border-left:2px solid var(--border);margin-left:18px;padding-left:12px;margin-top:10px;}
+
 /* ── PRINT ── */
 @media print {
   .sidebar,.sync-indicator,.btn,.page-header .btn,.filter-bar,.modal-overlay{display:none!important;}
@@ -600,6 +619,7 @@ button[title]:hover::before{content:'';position:absolute;bottom:calc(100% + 1px)
       <div class="nav-item" id="nav-empresas" onclick="nav('empresas',this)"><span>🏢</span> Empresas</div>
       <div class="nav-item" id="nav-equipamentos" onclick="nav('equipamentos',this)"><span>🧯</span> Equipamentos</div>
       <div class="nav-item" id="nav-inspecao" onclick="nav('inspecao',this)"><span>✅</span> Inspeção</div>
+      <div class="nav-item" id="nav-brigada" onclick="nav('brigada',this)"><span>🚒</span> Brigada</div>
       <div class="nav-item" id="nav-relatorios" onclick="nav('relatorios',this)"><span>📄</span> Relatórios</div>
       <div class="nav-item" id="nav-qrcodes" onclick="nav('qrcodes',this)"><span>📱</span> QR Codes</div>
     </div>
@@ -900,6 +920,91 @@ button[title]:hover::before{content:'';position:absolute;bottom:calc(100% + 1px)
         <div class="empty"><div class="empty-icon">📱</div><p>Nenhum extintor cadastrado</p></div>
       </div>
     </div>
+
+    <!-- BRIGADA DE INCÊNDIO -->
+    <div class="page" id="page-brigada">
+      <div class="page-header">
+        <div class="page-header-left">
+          <div class="page-title">Brigada de Incêndio</div>
+          <div class="page-subtitle">Brigadistas, treinamentos e validades — NBR 14276</div>
+          <div class="empresa-chip">🏢 <span id="brigEmpNome">—</span></div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-secondary" onclick="gerarPDFListaBrigada()">📄 Lista PDF</button>
+          <button class="btn btn-primary" onclick="abrirModalBrigadista()">+ Novo Brigadista</button>
+        </div>
+      </div>
+
+      <!-- TABS -->
+      <div style="display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:4px;margin-bottom:24px;width:fit-content">
+        <button class="rel-tab active" id="tab-brig-lista" onclick="trocarTabBrig('lista')">👥 Brigadistas</button>
+        <button class="rel-tab" id="tab-brig-org" onclick="trocarTabBrig('org')">🌳 Organograma</button>
+      </div>
+
+      <!-- PAINEL LISTA -->
+      <div id="painel-brig-lista">
+        <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
+          <div class="stat-card">
+            <div class="stat-top"><div class="stat-label">Brigadistas Ativos</div><div class="stat-icon">🚒</div></div>
+            <div class="stat-value sv-accent" id="bg0">—</div>
+            <div class="stat-trend">nesta empresa</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-top"><div class="stat-label">Certificados Válidos</div><div class="stat-icon">✅</div></div>
+            <div class="stat-value sv-green" id="bg1">—</div>
+            <div class="stat-trend">treinamento em dia</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-top"><div class="stat-label">Vencendo em 30 dias</div><div class="stat-icon">⚠️</div></div>
+            <div class="stat-value sv-yellow" id="bg2">—</div>
+            <div class="stat-trend">reciclagem pendente</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-top"><div class="stat-label">Vencidos / Sem Treinamento</div><div class="stat-icon">🚨</div></div>
+            <div class="stat-value sv-red" id="bg3">—</div>
+            <div class="stat-trend">ação necessária</div>
+          </div>
+        </div>
+        <div class="filter-bar">
+          <select class="form-input" id="brigFiltroTurno" onchange="renderBrigada()">
+            <option value="">Todos os turnos</option>
+            <option value="Diurno">Diurno</option>
+            <option value="Noturno">Noturno</option>
+            <option value="Revezamento">Revezamento</option>
+          </select>
+          <select class="form-input" id="brigFiltroStatus" onchange="renderBrigada()">
+            <option value="">Todos os status</option>
+            <option value="ok">Válido</option>
+            <option value="alerta">Vencendo</option>
+            <option value="vencido">Vencido</option>
+            <option value="sem">Sem treinamento</option>
+          </select>
+          <input class="search-input" id="brigBusca" placeholder="🔍 Buscar por nome ou setor..." oninput="renderBrigada()" style="margin-bottom:0;flex:1;max-width:280px">
+        </div>
+        <div class="table-card">
+          <table style="min-width:860px">
+            <thead><tr>
+              <th>Brigadista</th><th>Função</th><th>Setor</th><th>Turno</th>
+              <th>Últ. Treinamento</th><th>Validade</th><th>Aptidão Física</th><th>Status</th><th>Ações</th>
+            </tr></thead>
+            <tbody id="brigBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PAINEL ORGANOGRAMA -->
+      <div id="painel-brig-org" style="display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:16px">
+          <div style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:12px;padding:12px 18px;font-size:13px;color:var(--blue);flex:1;min-width:240px">
+            🌳 Organograma gerado automaticamente a partir das funções cadastradas. Brigadistas são agrupados sob o líder do seu setor.
+          </div>
+          <button class="btn btn-purple" onclick="imprimirOrganograma()">🖨 Imprimir / PDF</button>
+        </div>
+        <div id="orgChart" style="overflow-x:auto;padding-bottom:8px">
+          <div class="empty"><div class="empty-icon">🚒</div><p>Nenhum brigadista cadastrado</p></div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- NAVEGAÇÃO MOBILE INFERIOR -->
@@ -983,6 +1088,7 @@ button[title]:hover::before{content:'';position:absolute;bottom:calc(100% + 1px)
           <div class="perm-item" id="perm-empresas" onclick="togglePerm('empresas')"><div class="perm-check">✓</div><div class="perm-name">🏢 Empresas</div></div>
           <div class="perm-item" id="perm-equipamentos" onclick="togglePerm('equipamentos')"><div class="perm-check">✓</div><div class="perm-name">🧯 Equipamentos</div></div>
           <div class="perm-item" id="perm-inspecao" onclick="togglePerm('inspecao')"><div class="perm-check">✓</div><div class="perm-name">✅ Inspeção</div></div>
+          <div class="perm-item" id="perm-brigada" onclick="togglePerm('brigada')"><div class="perm-check">✓</div><div class="perm-name">🚒 Brigada</div></div>
           <div class="perm-item" id="perm-relatorios" onclick="togglePerm('relatorios')"><div class="perm-check">✓</div><div class="perm-name">📄 Relatórios</div></div>
           <div class="perm-item" id="perm-usuarios" onclick="togglePerm('usuarios')"><div class="perm-check">✓</div><div class="perm-name">👥 Usuários</div></div>
           <div class="perm-item" id="perm-qrcodes" onclick="togglePerm('qrcodes')"><div class="perm-check">✓</div><div class="perm-name">📱 QR Codes</div></div>
@@ -1119,6 +1225,116 @@ button[title]:hover::before{content:'';position:absolute;bottom:calc(100% + 1px)
       <div class="form-actions">
         <button class="btn btn-ghost" onclick="fecharModal('modalEquip')">Cancelar</button>
         <button class="btn btn-primary" onclick="salvarEquip()">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL BRIGADISTA (CADASTRO/EDIÇÃO) -->
+<div class="modal-overlay" id="modalBrigadista">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="mBrigTitulo">Novo Brigadista</div>
+      <button class="modal-close" onclick="fecharModal('modalBrigadista')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="bId">
+      <input type="hidden" id="bFotoData">
+      <div style="display:flex;gap:16px;align-items:center;margin-bottom:18px">
+        <div class="foto-upload" id="bFotoPreview" onclick="document.getElementById('bFotoInput').click()" title="Clique para adicionar foto">📷</div>
+        <input type="file" id="bFotoInput" accept="image/*" style="display:none" onchange="lerFotoBrig(event)">
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600;margin-bottom:4px">Foto do brigadista</div>
+          <div style="font-size:12px;color:var(--muted)">Usada no organograma e na lista impressa.</div>
+          <button class="btn btn-ghost btn-sm" id="btnRemoverFotoBrig" onclick="removerFotoBrig()" style="display:none;margin-top:8px">✕ Remover foto</button>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Nome completo</label><input class="form-input" id="bNome" placeholder="Ex: Carlos Mendes"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Função na brigada</label>
+          <select class="form-input" id="bFuncao">
+            <option value="brigadista">🧑‍🚒 Brigadista</option>
+            <option value="lider">🔹 Líder de Setor</option>
+            <option value="chefe">🔸 Chefe da Brigada</option>
+            <option value="coordenador">⭐ Coordenador Geral</option>
+          </select></div>
+        <div class="form-group"><label class="form-label">Turno</label>
+          <select class="form-input" id="bTurno">
+            <option value="Diurno">Diurno</option>
+            <option value="Noturno">Noturno</option>
+            <option value="Revezamento">Revezamento</option>
+          </select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Setor</label><input class="form-input" id="bSetor" placeholder="Ex: Galpão B"></div>
+        <div class="form-group"><label class="form-label">Telefone / Ramal</label><input class="form-input" id="bTel" placeholder="(00) 00000-0000"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Aptidão física válida até</label><input class="form-input" type="date" id="bAptidao"></div>
+        <div class="form-group"><label class="form-label">Situação</label>
+          <select class="form-input" id="bStatus">
+            <option value="ativo">✅ Ativo</option>
+            <option value="afastado">⏸ Afastado</option>
+            <option value="desligado">🚫 Desligado da brigada</option>
+          </select></div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-ghost" onclick="fecharModal('modalBrigadista')">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarBrigadista()">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL FICHA DO BRIGADISTA -->
+<div class="modal-overlay" id="modalFichaBrig">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-head">
+      <div class="modal-title">Ficha do Brigadista</div>
+      <button class="modal-close" onclick="fecharFichaBrig()">✕</button>
+    </div>
+    <div class="modal-body" id="fichaBrigBody"></div>
+  </div>
+</div>
+
+<!-- MODAL TREINAMENTO -->
+<div class="modal-overlay" id="modalTrein">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-head">
+      <div class="modal-title">Registrar Treinamento</div>
+      <button class="modal-close" onclick="fecharModal('modalTrein')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="tBrigId">
+      <div class="form-group"><label class="form-label">Tipo de treinamento</label>
+        <select class="form-input" id="tTipo">
+          <option value="Formação de Brigada (NBR 14276)">Formação de Brigada (NBR 14276)</option>
+          <option value="Reciclagem de Brigada (NBR 14276)">Reciclagem de Brigada (NBR 14276)</option>
+          <option value="Primeiros Socorros">Primeiros Socorros</option>
+          <option value="Combate a Incêndio">Combate a Incêndio</option>
+          <option value="Evacuação / Abandono de Área">Evacuação / Abandono de Área</option>
+          <option value="Outro">Outro</option>
+        </select></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Data de realização</label><input class="form-input" type="date" id="tData" onchange="sugerirValidadeTrein()"></div>
+        <div class="form-group"><label class="form-label">Válido até</label><input class="form-input" type="date" id="tValidade"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Carga horária</label><input class="form-input" id="tCarga" placeholder="Ex: 8h"></div>
+        <div class="form-group"><label class="form-label">Nº do certificado</label><input class="form-input" id="tCert" placeholder="Opcional"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Instrutor / Empresa</label><input class="form-input" id="tInstrutor" placeholder="Ex: SOS Treinamentos"></div>
+      <div class="form-group">
+        <label class="form-label">Certificado (foto opcional)</label>
+        <div style="display:flex;align-items:center;gap:10px">
+          <button class="btn btn-secondary btn-sm" onclick="document.getElementById('tFotoInput').click()">📎 Anexar</button>
+          <input type="file" id="tFotoInput" accept="image/*" style="display:none" onchange="lerFotoTrein(event)">
+          <span id="tFotoLabel" style="font-size:12px;color:var(--muted)">Nenhum anexo</span>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-ghost" onclick="fecharModal('modalTrein')">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarTreinamento()">Salvar Treinamento</button>
       </div>
     </div>
   </div>
@@ -1405,16 +1621,16 @@ const auth=getAuth(fbApp);
 const db=getFirestore(fbApp);
 
 // ── STATE ──
-let empresas=[], equipamentos=[], usuarios=[];
+let empresas=[], equipamentos=[], usuarios=[], brigadistas=[];
 let inspAtual=null, inspState={};
 let currentUser=null, currentPerms=[], currentEmpresas=[];
 let empresaAtiva=null;
-let unsubEmp, unsubEquip, unsubUsers;
+let unsubEmp, unsubEquip, unsubUsers, unsubBrig;
 let chartInsp=null, chartTipo=null;
 
-const TODAS_PERMS=['dashboard','empresas','equipamentos','inspecao','relatorios','usuarios','qrcodes'];
-const PERMS_ADMIN=['dashboard','usuarios','empresas','equipamentos','inspecao','relatorios','qrcodes'];
-const PERMS_USER=['dashboard','inspecao','equipamentos','relatorios','qrcodes'];
+const TODAS_PERMS=['dashboard','empresas','equipamentos','inspecao','brigada','relatorios','usuarios','qrcodes'];
+const PERMS_ADMIN=['dashboard','usuarios','empresas','equipamentos','inspecao','brigada','relatorios','qrcodes'];
+const PERMS_USER=['dashboard','inspecao','equipamentos','brigada','relatorios','qrcodes'];
 
 // ── QR SCAN / INICIAR DIRETO ──
 const params=new URLSearchParams(location.search);
@@ -1504,7 +1720,7 @@ window.selecionarEmpresa=id=>{
   empresaAtiva=empresas.find(e=>e.id===id);
   if(!empresaAtiva) return;
   document.getElementById('empresaAtivaNome').textContent=empresaAtiva.nome;
-  ['dashEmpNome','equipEmpNome','inspEmpNome','relEmpNome','qrEmpNome'].forEach(el=>{
+  ['dashEmpNome','equipEmpNome','inspEmpNome','relEmpNome','qrEmpNome','brigEmpNome'].forEach(el=>{
     const e=document.getElementById(el);if(e)e.textContent=empresaAtiva.nome;
   });
   aplicarPermissoes(currentPerms);
@@ -1512,7 +1728,7 @@ window.selecionarEmpresa=id=>{
   ['loginPage','registerPage','pendingPage','selectEmpresaPage'].forEach(p=>document.getElementById(p).style.display='none');
   fecharModal('modalTrocarEmpresa');
   inspAtual=null;inspState={};
-  renderDashboard();renderEquipamentos();renderCards();renderRelInspecoes();
+  renderDashboard();renderEquipamentos();renderCards();renderRelInspecoes();renderBrigada();
 };
 
 window.trocarEmpresa=()=>{
@@ -1623,13 +1839,13 @@ async function notificarAdminsCadastroPendente(nomeNovo, emailNovo){
 
 window.doLogout=async()=>{
   pararListeners();currentUser=null;currentPerms=[];currentEmpresas=[];
-  empresaAtiva=null;empresas=[];equipamentos=[];usuarios=[];
+  empresaAtiva=null;empresas=[];equipamentos=[];usuarios=[];brigadistas=[];
   document.getElementById('appShell').style.display='none';
   await signOut(auth);
 };
 
 function pararListeners(){
-  if(unsubEmp)unsubEmp();if(unsubEquip)unsubEquip();if(unsubUsers)unsubUsers();
+  if(unsubEmp)unsubEmp();if(unsubEquip)unsubEquip();if(unsubUsers)unsubUsers();if(unsubBrig)unsubBrig();
 }
 
 // ── LISTENERS ──
@@ -1655,6 +1871,11 @@ function iniciarListeners(onReady){
     equLoaded=true;checkReady();
     if(empresaAtiva){renderEquipamentos();renderDashboard();renderCards();renderRel();renderQRCodes();}
     setSyncing(false);
+  });
+  unsubBrig=onSnapshot(query(collection(db,'brigadistas'),orderBy('criadoEm','asc')),snap=>{
+    brigadistas=snap.docs.map(d=>({id:d.id,...d.data()}));
+    if(empresaAtiva)renderBrigada();
+    if(window._fichaBrigId)renderFichaBrig(window._fichaBrigId);
   });
   // Listener inspeções salvas
   if(window._unsubInsp)window._unsubInsp();
@@ -1744,6 +1965,7 @@ window.nav=(page,el)=>{
   if(page==='relatorios'){renderRel();renderRelInsp();}
   if(page==='dashboard')renderDashboard();
   if(page==='qrcodes')renderQRCodes();
+  if(page==='brigada')renderBrigada();
 };
 
 // ── THEME TOGGLE ──
@@ -2221,6 +2443,517 @@ window.delEquip=async id=>{
   if(!confirm('Excluir extintor?'))return;
   await deleteDoc(doc(db,'equipamentos',id));toast('Extintor removido');
 };
+
+// ═══════════════ BRIGADA DE INCÊNDIO ═══════════════
+const FUNCOES_BRIG={coordenador:'Coordenador Geral',chefe:'Chefe da Brigada',lider:'Líder de Setor',brigadista:'Brigadista'};
+window._fichaBrigId=null;
+window._treinFoto=null;
+
+function brigDaEmpresa(){
+  if(!empresaAtiva)return[];
+  return brigadistas.filter(b=>b.empresaId===empresaAtiva.id);
+}
+function brigAtivosBrigada(){
+  return brigDaEmpresa().filter(b=>(b.status||'ativo')!=='desligado');
+}
+function treinosOrdenados(b){
+  return(b.treinamentos||[]).slice().sort((a,c)=>(c.data||'').localeCompare(a.data||''));
+}
+// Treinamento de brigada (formação/reciclagem NBR) com maior validade
+function ultTreinoBrigadaNBR(b){
+  const ts=(b.treinamentos||[]).filter(t=>(t.tipo||'').toLowerCase().includes('brigada'));
+  if(!ts.length)return null;
+  return ts.slice().sort((a,c)=>(c.validade||'').localeCompare(a.validade||''))[0];
+}
+const getStatusValidade=v=>{
+  if(!v)return'sem';
+  const diff=(new Date(v+'T23:59:59')-new Date())/864e5;
+  return diff<0?'vencido':diff<=30?'alerta':'ok';
+};
+const fmtDia=d=>d?new Date(d+'T00:00:00').toLocaleDateString('pt-BR'):'—';
+const badgeBrig=(s,venc)=>{
+  if(s==='sem')return'<span class="badge pendente">— Sem registro</span>';
+  if(s==='vencido')return'<span class="badge vencido">✕ Vencido</span>';
+  if(s==='alerta'){
+    const dias=venc?Math.max(0,Math.ceil((new Date(venc+'T23:59:59')-new Date())/864e5)):0;
+    return`<span class="badge alerta">⚠ Vence em ${dias}d</span>`;
+  }
+  return'<span class="badge ok">✓ Válido</span>';
+};
+const funcaoBadgeBrig=f=>{
+  const m={coordenador:['admin','⭐ Coordenador'],chefe:['admin','🔸 Chefe'],lider:['usuario','🔹 Líder'],brigadista:['pendente','Brigadista']};
+  const[c,t]=m[f]||['pendente','Brigadista'];
+  return`<span class="badge ${c}">${t}</span>`;
+};
+const avatarBrig=(b,size)=>{
+  const s=size||36;
+  if(b.foto)return`<img src="${b.foto}" class="brig-foto" style="width:${s}px;height:${s}px">`;
+  const ini=(b.nome||'?').split(' ').filter(w=>w.length>1).slice(0,2).map(w=>w[0]).join('').toUpperCase()||(b.nome||'?')[0].toUpperCase();
+  const cores={coordenador:'background:rgba(255,77,28,.18);color:var(--accent)',chefe:'background:rgba(255,77,28,.18);color:var(--accent)',lider:'background:rgba(59,130,246,.18);color:var(--blue)',brigadista:'background:rgba(107,114,128,.25);color:var(--muted)'};
+  return`<span class="brig-iniciais" style="width:${s}px;height:${s}px;font-size:${Math.round(s/3)}px;${cores[b.funcao]||cores.brigadista}">${ini}</span>`;
+};
+
+// ── TABS ──
+window.trocarTabBrig=tab=>{
+  ['lista','org'].forEach(t=>{
+    const tb=document.getElementById('tab-brig-'+t);
+    const pn=document.getElementById('painel-brig-'+t);
+    if(tb)tb.classList.toggle('active',t===tab);
+    if(pn)pn.style.display=t===tab?'block':'none';
+  });
+  if(tab==='org')renderOrganograma();
+};
+
+// ── RENDER LISTA ──
+window.renderBrigada=()=>{
+  const body=document.getElementById('brigBody');if(!body)return;
+  const todos=brigAtivosBrigada();
+  // Stats
+  const stats={ok:0,alerta:0,vencido:0,sem:0};
+  todos.forEach(b=>{stats[getStatusValidade(ultTreinoBrigadaNBR(b)?.validade)]++;});
+  const setV=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  setV('bg0',todos.length);setV('bg1',stats.ok);setV('bg2',stats.alerta);setV('bg3',stats.vencido+stats.sem);
+  // Filtros
+  const fTurno=document.getElementById('brigFiltroTurno')?.value||'';
+  const fStatus=document.getElementById('brigFiltroStatus')?.value||'';
+  const busca=(document.getElementById('brigBusca')?.value||'').toLowerCase();
+  const vis=todos.filter(b=>{
+    if(fTurno&&b.turno!==fTurno)return false;
+    if(fStatus&&getStatusValidade(ultTreinoBrigadaNBR(b)?.validade)!==fStatus)return false;
+    if(busca&&!((b.nome||'').toLowerCase().includes(busca)||(b.setor||'').toLowerCase().includes(busca)))return false;
+    return true;
+  }).sort((a,c)=>{
+    const ord={coordenador:0,chefe:1,lider:2,brigadista:3};
+    return(ord[a.funcao]??3)-(ord[c.funcao]??3)||(a.nome||'').localeCompare(c.nome||'');
+  });
+  body.innerHTML=vis.length
+    ?vis.map(b=>{
+      const t=ultTreinoBrigadaNBR(b);
+      const st=getStatusValidade(t?.validade);
+      const stApt=getStatusValidade(b.aptidao);
+      const afastado=(b.status||'ativo')==='afastado';
+      return`<tr style="${afastado?'opacity:.55':''}">
+        <td style="cursor:pointer" onclick="abrirFichaBrig('${b.id}')" title="Abrir ficha">
+          <span style="display:inline-flex;align-items:center;gap:10px">${avatarBrig(b,32)}<strong style="font-size:12.5px">${b.nome||'—'}</strong>${afastado?'<span class="badge pendente">⏸ Afastado</span>':''}</span>
+        </td>
+        <td>${funcaoBadgeBrig(b.funcao)}</td>
+        <td title="${b.setor||''}">${b.setor||'—'}</td>
+        <td style="color:var(--muted)">${b.turno||'—'}</td>
+        <td style="color:${t?'':'var(--muted)'}">${t?fmtDia(t.data):'—'}</td>
+        <td style="color:${st==='vencido'?'var(--red)':st==='alerta'?'var(--yellow)':st==='sem'?'var(--muted)':''}">${t?.validade?fmtDia(t.validade):'—'}</td>
+        <td>${b.aptidao?badgeBrig(stApt,b.aptidao):'<span style="color:var(--muted);font-size:12px">—</span>'}</td>
+        <td>${badgeBrig(st,t?.validade)}</td>
+        <td style="padding:8px 10px;overflow:visible">
+          <button class="btn btn-ghost btn-sm" onclick="abrirFichaBrig('${b.id}')" style="padding:5px 9px;font-size:13px" title="Ficha e treinamentos">👁</button>
+          <button class="btn btn-ghost btn-sm" onclick="editBrigadista('${b.id}')" style="padding:5px 9px;font-size:13px" title="Editar brigadista">✏</button>
+        </td>
+      </tr>`;
+    }).join('')
+    :'<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--muted)">Nenhum brigadista cadastrado para esta empresa</td></tr>';
+  const pnOrg=document.getElementById('painel-brig-org');
+  if(pnOrg&&pnOrg.style.display!=='none')renderOrganograma();
+};
+
+// ── CADASTRO ──
+window.abrirModalBrigadista=()=>{
+  document.getElementById('mBrigTitulo').textContent='Novo Brigadista';
+  ['bId','bNome','bSetor','bTel','bAptidao','bFotoData'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('bFuncao').value='brigadista';
+  document.getElementById('bTurno').value='Diurno';
+  document.getElementById('bStatus').value='ativo';
+  document.getElementById('bFotoPreview').innerHTML='📷';
+  document.getElementById('btnRemoverFotoBrig').style.display='none';
+  document.getElementById('bFotoInput').value='';
+  abrirModal('modalBrigadista');
+};
+window.lerFotoBrig=ev=>{
+  const f=ev.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=async e=>{
+    const comprimida=await comprimirImagem(e.target.result,400,400,0.82);
+    document.getElementById('bFotoData').value=comprimida;
+    document.getElementById('bFotoPreview').innerHTML=`<img src="${comprimida}">`;
+    document.getElementById('btnRemoverFotoBrig').style.display='inline-flex';
+  };
+  r.readAsDataURL(f);
+};
+window.removerFotoBrig=()=>{
+  document.getElementById('bFotoData').value='';
+  document.getElementById('bFotoPreview').innerHTML='📷';
+  document.getElementById('btnRemoverFotoBrig').style.display='none';
+  document.getElementById('bFotoInput').value='';
+};
+window.salvarBrigadista=async()=>{
+  const id=document.getElementById('bId').value;
+  const obj={
+    nome:document.getElementById('bNome').value.trim(),
+    funcao:document.getElementById('bFuncao').value,
+    setor:document.getElementById('bSetor').value.trim(),
+    turno:document.getElementById('bTurno').value,
+    tel:document.getElementById('bTel').value.trim(),
+    aptidao:document.getElementById('bAptidao').value||'',
+    status:document.getElementById('bStatus').value,
+    foto:document.getElementById('bFotoData').value||'',
+    empresaId:empresaAtiva.id
+  };
+  if(!obj.nome){toast('Informe o nome do brigadista','error');return;}
+  setSyncing(true);
+  try{
+    id?await updateDoc(doc(db,'brigadistas',id),obj)
+      :await addDoc(collection(db,'brigadistas'),{...obj,treinamentos:[],criadoEm:serverTimestamp()});
+    fecharModal('modalBrigadista');toast('Brigadista salvo! ☁️');
+  }catch(e){toast('Erro ao salvar: '+e.message,'error');setSyncing(false);}
+};
+window.editBrigadista=id=>{
+  const b=brigadistas.find(x=>x.id===id);if(!b)return;
+  document.getElementById('mBrigTitulo').textContent='Editar Brigadista';
+  document.getElementById('bId').value=b.id;
+  document.getElementById('bNome').value=b.nome||'';
+  document.getElementById('bFuncao').value=b.funcao||'brigadista';
+  document.getElementById('bTurno').value=b.turno||'Diurno';
+  document.getElementById('bSetor').value=b.setor||'';
+  document.getElementById('bTel').value=b.tel||'';
+  document.getElementById('bAptidao').value=b.aptidao||'';
+  document.getElementById('bStatus').value=b.status||'ativo';
+  document.getElementById('bFotoData').value=b.foto||'';
+  document.getElementById('bFotoPreview').innerHTML=b.foto?`<img src="${b.foto}">`:'📷';
+  document.getElementById('btnRemoverFotoBrig').style.display=b.foto?'inline-flex':'none';
+  document.getElementById('bFotoInput').value='';
+  fecharFichaBrig();
+  abrirModal('modalBrigadista');
+};
+window.delBrigadista=async id=>{
+  const b=brigadistas.find(x=>x.id===id);
+  if(!confirm(`Excluir o brigadista "${b?.nome||''}" e todo o histórico de treinamentos? Esta ação não pode ser desfeita.`))return;
+  setSyncing(true);
+  await deleteDoc(doc(db,'brigadistas',id));
+  fecharFichaBrig();toast('Brigadista removido');
+};
+
+// ── FICHA ──
+window.abrirFichaBrig=id=>{
+  window._fichaBrigId=id;
+  renderFichaBrig(id);
+  abrirModal('modalFichaBrig');
+};
+window.fecharFichaBrig=()=>{
+  window._fichaBrigId=null;
+  fecharModal('modalFichaBrig');
+};
+window.renderFichaBrig=id=>{
+  const cont=document.getElementById('fichaBrigBody');if(!cont)return;
+  const b=brigadistas.find(x=>x.id===id);
+  if(!b){fecharFichaBrig();return;}
+  const tb=ultTreinoBrigadaNBR(b);
+  const stT=getStatusValidade(tb?.validade);
+  const stA=getStatusValidade(b.aptidao);
+  const corSt={ok:'var(--green)',alerta:'var(--yellow)',vencido:'var(--red)',sem:'var(--muted)'};
+  const treins=treinosOrdenados(b);
+  const vigenteId=tb?tb.id:null;
+  cont.innerHTML=`
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
+      ${avatarBrig(b,56)}
+      <div style="flex:1;min-width:0">
+        <div style="font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px;flex-wrap:wrap">${b.nome||'—'} ${funcaoBadgeBrig(b.funcao)}${(b.status||'ativo')!=='ativo'?'<span class="badge pendente">'+(b.status==='afastado'?'⏸ Afastado':'🚫 Desligado')+'</span>':''}</div>
+        <div style="font-size:12.5px;color:var(--muted);margin-top:2px">${b.setor||'Sem setor'} · ${b.turno||'—'}${b.tel?' · '+b.tel:''}</div>
+      </div>
+    </div>
+    <div class="form-row" style="margin-bottom:16px">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px">
+        <div style="font-size:10px;color:var(--muted);letter-spacing:.3px">CERTIFICADO DE BRIGADA</div>
+        <div style="font-size:13px;font-weight:600;color:${corSt[stT]}">${tb?.validade?((stT==='vencido'?'Venceu ':'Vence ')+fmtDia(tb.validade)):'Sem registro'}</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px">
+        <div style="font-size:10px;color:var(--muted);letter-spacing:.3px">APTIDÃO FÍSICA</div>
+        <div style="font-size:13px;font-weight:600;color:${corSt[stA]}">${b.aptidao?((stA==='vencido'?'Venceu ':'Válida até ')+fmtDia(b.aptidao)):'Sem registro'}</div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div style="font-family:var(--font-head);font-size:14px;font-weight:700">🎓 Treinamentos (${treins.length})</div>
+      <button class="btn btn-secondary btn-sm" onclick="abrirModalTrein('${b.id}')">+ Adicionar</button>
+    </div>
+    ${treins.length?treins.map(t=>{
+      const st=getStatusValidade(t.validade);
+      const isBrigada=(t.tipo||'').toLowerCase().includes('brigada');
+      const hist=isBrigada&&t.id!==vigenteId;
+      return`<div class="trein-item ${hist?'trein-hist':''}">
+        <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center">
+          <span style="font-size:13px;font-weight:500">${t.tipo||'Treinamento'}</span>
+          <span style="display:inline-flex;gap:6px;align-items:center">
+            ${hist?'<span class="badge pendente">Histórico</span>':badgeBrig(st,t.validade)}
+            <button class="btn btn-ghost btn-sm" onclick="delTreinamento('${b.id}','${t.id}')" style="padding:3px 8px;font-size:12px" title="Excluir registro">🗑</button>
+          </span>
+        </div>
+        <div style="font-size:11.5px;color:var(--muted);margin-top:3px">
+          ${fmtDia(t.data)}${t.carga?' · '+t.carga:''}${t.instrutor?' · '+t.instrutor:''}${t.cert?' · cert. nº '+t.cert:''}${t.validade?' · válido até '+fmtDia(t.validade):''}
+        </div>
+        ${t.foto?`<img src="${t.foto}" onclick="verFotoTrein('${b.id}','${t.id}')" style="margin-top:8px;max-width:140px;max-height:90px;border-radius:8px;border:1px solid var(--border);cursor:zoom-in;object-fit:cover" title="Ver certificado">`:''}
+      </div>`;
+    }).join(''):'<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;background:var(--surface);border:1px dashed var(--border);border-radius:10px">Nenhum treinamento registrado.<br>Adicione a formação de brigada para ativar o controle de validade.</div>'}
+    <div class="modal-divider"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
+      ${currentUser?.perfil==='admin'?`<button class="btn btn-red btn-sm" onclick="delBrigadista('${b.id}')">🗑 Excluir</button>`:''}
+      <button class="btn btn-secondary btn-sm" onclick="editBrigadista('${b.id}')">✏ Editar dados</button>
+      <button class="btn btn-ghost btn-sm" onclick="fecharFichaBrig()">Fechar</button>
+    </div>`;
+};
+window.verFotoTrein=(bid,tid)=>{
+  const b=brigadistas.find(x=>x.id===bid);
+  const t=(b?.treinamentos||[]).find(x=>String(x.id)===String(tid));
+  if(!t?.foto)return;
+  const w=window.open('','_blank');
+  if(!w){toast('Permita popups para ver o certificado','error');return;}
+  w.document.write('<title>Certificado — '+(b.nome||'')+'</title><body style="margin:0;background:#15171e;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="'+t.foto+'" style="max-width:100%;max-height:100vh"></body>');
+  w.document.close();
+};
+
+// ── TREINAMENTOS (SUB-REGISTROS) ──
+window.abrirModalTrein=bid=>{
+  document.getElementById('tBrigId').value=bid;
+  ['tData','tValidade','tCarga','tCert','tInstrutor'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('tTipo').value='Reciclagem de Brigada (NBR 14276)';
+  document.getElementById('tFotoInput').value='';
+  document.getElementById('tFotoLabel').textContent='Nenhum anexo';
+  window._treinFoto=null;
+  abrirModal('modalTrein');
+};
+window.sugerirValidadeTrein=()=>{
+  const d=document.getElementById('tData').value;
+  const v=document.getElementById('tValidade');
+  if(d&&!v.value){
+    const x=new Date(d+'T00:00:00');
+    x.setFullYear(x.getFullYear()+1);
+    v.value=x.toISOString().substring(0,10);
+  }
+};
+window.lerFotoTrein=ev=>{
+  const f=ev.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=async e=>{
+    window._treinFoto=await comprimirImagem(e.target.result,900,900,0.78);
+    document.getElementById('tFotoLabel').textContent='📎 1 anexo carregado';
+  };
+  r.readAsDataURL(f);
+};
+window.salvarTreinamento=async()=>{
+  const bid=document.getElementById('tBrigId').value;
+  const b=brigadistas.find(x=>x.id===bid);
+  if(!b){toast('Brigadista não encontrado','error');return;}
+  const data=document.getElementById('tData').value;
+  if(!data){toast('Informe a data de realização','error');return;}
+  const novo={
+    id:Date.now().toString(36),
+    tipo:document.getElementById('tTipo').value,
+    data,
+    validade:document.getElementById('tValidade').value||'',
+    carga:document.getElementById('tCarga').value.trim(),
+    cert:document.getElementById('tCert').value.trim(),
+    instrutor:document.getElementById('tInstrutor').value.trim(),
+    foto:window._treinFoto||''
+  };
+  setSyncing(true);
+  try{
+    await updateDoc(doc(db,'brigadistas',bid),{treinamentos:[...(b.treinamentos||[]),novo]});
+    fecharModal('modalTrein');toast('Treinamento registrado! ☁️');
+  }catch(e){toast('Erro ao salvar: '+e.message,'error');setSyncing(false);}
+};
+window.delTreinamento=async(bid,tid)=>{
+  const b=brigadistas.find(x=>x.id===bid);if(!b)return;
+  if(!confirm('Excluir este registro de treinamento?'))return;
+  setSyncing(true);
+  await updateDoc(doc(db,'brigadistas',bid),{treinamentos:(b.treinamentos||[]).filter(t=>String(t.id)!==String(tid))});
+  toast('Registro removido');
+};
+
+// ── ORGANOGRAMA ──
+function gruposOrg(){
+  const todos=brigAtivosBrigada().filter(b=>(b.status||'ativo')==='ativo');
+  const norm=s=>(s||'').trim().toLowerCase();
+  const coord=todos.filter(b=>b.funcao==='coordenador');
+  const chefes=todos.filter(b=>b.funcao==='chefe');
+  const lideres=todos.filter(b=>b.funcao==='lider');
+  const base=todos.filter(b=>!b.funcao||b.funcao==='brigadista');
+  const usados=new Set();
+  const grupos=lideres.map(l=>{
+    const filhos=norm(l.setor)?base.filter(b=>norm(b.setor)===norm(l.setor)):[];
+    filhos.forEach(f=>usados.add(f.id));
+    return{lider:l,filhos};
+  });
+  const semLider=base.filter(b=>!usados.has(b.id));
+  return{coord,chefes,grupos,semLider};
+}
+window.renderOrganograma=()=>{
+  const el=document.getElementById('orgChart');if(!el)return;
+  if(!brigAtivosBrigada().length){
+    el.innerHTML='<div class="empty"><div class="empty-icon">🚒</div><p>Nenhum brigadista cadastrado para esta empresa</p></div>';
+    return;
+  }
+  const{coord,chefes,grupos,semLider}=gruposOrg();
+  const node=(b,cls,corFuncao)=>`<div class="org-node ${cls||''}">${avatarBrig(b,42)}<div style="min-width:0"><div class="org-nome">${b.nome}</div><div class="org-funcao" style="color:${corFuncao}">${(FUNCOES_BRIG[b.funcao]||'Brigadista').toUpperCase()}</div><div class="org-sub">${b.setor||''}${b.setor&&b.turno?' · ':''}${b.turno||''}</div></div></div>`;
+  const mini=b=>`<div class="org-node-sm">${avatarBrig(b,28)}<div style="min-width:0"><div style="font-size:11px;font-weight:500">${b.nome}</div><div style="font-size:9px;color:var(--muted)">Brigadista${b.turno?' · '+b.turno:''}</div></div></div>`;
+  const linhaCentro=(lst,cls,cor)=>`<div style="display:flex;justify-content:center;gap:14px;flex-wrap:wrap">${lst.map(b=>node(b,cls,cor)).join('')}</div>`;
+  let html='<div style="min-width:560px;padding:4px">';
+  if(coord.length){html+=linhaCentro(coord,'nivel-top','var(--accent)');}
+  if(coord.length&&(chefes.length||grupos.length||semLider.length))html+='<div class="org-vline" style="height:18px"></div>';
+  if(chefes.length){html+=linhaCentro(chefes,'nivel-top','var(--accent)');}
+  if(chefes.length&&(grupos.length||semLider.length))html+='<div class="org-vline" style="height:18px"></div>';
+  html+=`<div style="display:flex;justify-content:center;gap:16px;flex-wrap:wrap;align-items:flex-start">`;
+  html+=grupos.map(g=>`<div class="org-grupo">${node(g.lider,'nivel-lider','var(--blue)')}<div class="org-filhos">${g.filhos.length?g.filhos.map(mini).join(''):'<div style="font-size:11px;color:var(--muted);padding:4px 0">Sem brigadistas neste setor</div>'}</div></div>`).join('');
+  if(semLider.length){
+    html+=`<div class="org-grupo"><div class="org-node" style="border-style:dashed"><span class="brig-iniciais" style="width:42px;height:42px;border:1px dashed var(--border);background:transparent">👥</span><div><div class="org-nome">${grupos.length?'Demais brigadistas':'Brigadistas'}</div><div class="org-sub">${grupos.length?'sem líder de setor':''}</div></div></div><div class="org-filhos">${semLider.map(mini).join('')}</div></div>`;
+  }
+  html+='</div></div>';
+  el.innerHTML=html;
+};
+
+// ── IMPRESSÃO ORGANOGRAMA (A4 paisagem, fundo branco) ──
+window.imprimirOrganograma=()=>{
+  if(!brigAtivosBrigada().length){toast('Cadastre brigadistas primeiro','error');return;}
+  const{coord,chefes,grupos,semLider}=gruposOrg();
+  const emp=empresaAtiva||{};
+  const agora=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+  const fotoP=(b,s)=>b.foto
+    ?`<img src="${b.foto}" style="width:${s}px;height:${s}px;border-radius:50%;object-fit:cover;border:2px solid #e5e7eb">`
+    :`<div style="width:${s}px;height:${s}px;border-radius:50%;background:#f3f4f6;border:2px solid #e5e7eb;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:${Math.round(s/3)}px;color:#6b7280">${(b.nome||'?').split(' ').filter(w=>w.length>1).slice(0,2).map(w=>w[0]).join('').toUpperCase()}</div>`;
+  const nodeP=(b,cor)=>`<div class="onode" style="border-color:${cor}"><div style="display:flex;justify-content:center;margin-bottom:6px">${fotoP(b,54)}</div><div class="onome">${b.nome}</div><div class="ofunc" style="color:${cor}">${(FUNCOES_BRIG[b.funcao]||'Brigadista').toUpperCase()}</div><div class="osub">${b.setor||''}${b.setor&&b.turno?' · ':''}${b.turno||''}${b.tel?'<br>'+b.tel:''}</div></div>`;
+  const miniP=b=>`<div class="omini">${fotoP(b,34)}<div><div style="font-size:11px;font-weight:600;color:#111">${b.nome}</div><div style="font-size:9px;color:#6b7280">Brigadista${b.turno?' · '+b.turno:''}</div></div></div>`;
+  const linha=(lst,cor)=>`<div class="olinha">${lst.map(b=>nodeP(b,cor)).join('')}</div>`;
+  let corpo='';
+  if(coord.length)corpo+=linha(coord,'#ff4d1c');
+  if(coord.length&&(chefes.length||grupos.length||semLider.length))corpo+='<div class="ovline"></div>';
+  if(chefes.length)corpo+=linha(chefes,'#ff4d1c');
+  if(chefes.length&&(grupos.length||semLider.length))corpo+='<div class="ovline"></div>';
+  corpo+='<div class="ogrupos">';
+  corpo+=grupos.map(g=>`<div class="ogrupo">${nodeP(g.lider,'#3b82f6')}<div class="ofilhos">${g.filhos.map(miniP).join('')||'<div style="font-size:10px;color:#9ca3af;padding:4px 0">Sem brigadistas neste setor</div>'}</div></div>`).join('');
+  if(semLider.length)corpo+=`<div class="ogrupo"><div class="onode" style="border-style:dashed;border-color:#d1d5db"><div class="onome">${grupos.length?'Demais brigadistas':'Brigadistas'}</div><div class="osub">${grupos.length?'sem líder de setor':''}</div></div><div class="ofilhos">${semLider.map(miniP).join('')}</div></div>`;
+  corpo+='</div>';
+  const logoHtml=emp.logo
+    ?`<img src="${emp.logo}" style="width:52px;height:52px;object-fit:contain;border-radius:8px">`
+    :`<div style="width:52px;height:52px;background:#ff4d1c;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:26px">🔥</div>`;
+  const html=`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
+<title>Organograma da Brigada — ${emp.nome||''}</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  @page{size:A4 landscape;margin:12mm;}
+  body{font-family:'Segoe UI',Arial,sans-serif;color:#111;background:#fff;font-size:13px;}
+  .cab{display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid #ff4d1c;padding-bottom:12px;margin-bottom:18px;}
+  .cab-emp{display:flex;align-items:center;gap:12px;}
+  .cab h1{font-size:17px;}
+  .cab .sub{font-size:11px;color:#6b7280;}
+  .tit{text-align:right;}
+  .tit .t1{font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;}
+  .tit .t2{font-size:11px;color:#6b7280;}
+  .olinha{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;}
+  .onode{border:2px solid #e5e7eb;border-radius:12px;padding:10px 16px;text-align:center;min-width:170px;max-width:210px;break-inside:avoid;}
+  .onome{font-size:13px;font-weight:800;}
+  .ofunc{font-size:9px;font-weight:700;letter-spacing:.5px;margin-top:2px;}
+  .osub{font-size:10px;color:#6b7280;margin-top:2px;}
+  .ovline{width:2px;height:16px;background:#d1d5db;margin:0 auto;}
+  .ogrupos{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;align-items:flex-start;margin-top:4px;}
+  .ogrupo{min-width:200px;max-width:240px;break-inside:avoid;}
+  .ofilhos{border-left:2px solid #e5e7eb;margin-left:16px;padding-left:10px;margin-top:8px;}
+  .omini{display:flex;align-items:center;gap:8px;border:1px solid #e5e7eb;border-radius:8px;padding:5px 8px;margin-bottom:5px;break-inside:avoid;}
+  .rodape{margin-top:28px;display:flex;gap:40px;justify-content:center;break-inside:avoid;}
+  .ass{text-align:center;font-size:11px;color:#374151;width:260px;}
+  .ass .lin{border-top:1px solid #9ca3af;margin-bottom:4px;padding-top:4px;}
+  .ft{margin-top:18px;display:flex;justify-content:space-between;font-size:9px;color:#9ca3af;border-top:1px solid #e5e7eb;padding-top:6px;}
+</style></head><body>
+<div class="cab">
+  <div class="cab-emp">${logoHtml}<div><h1>${emp.nome||'—'}</h1><div class="sub">${emp.cnpj?'CNPJ: '+emp.cnpj:''}${emp.cidade?' · '+emp.cidade+(emp.estado?'/'+emp.estado:''):''}</div></div></div>
+  <div class="tit"><div class="t1">Organograma da Brigada de Incêndio</div><div class="t2">NBR 14276 · Emitido em ${agora}</div></div>
+</div>
+${corpo}
+<div class="rodape">
+  <div class="ass"><div style="height:40px"></div><div class="lin"></div>Responsável pela Brigada</div>
+  <div class="ass"><div style="height:40px"></div><div class="lin"></div>Responsável pela Empresa</div>
+</div>
+<div class="ft"><span>FireGuard — Gestão de Brigada de Incêndio</span><span>Documento gerado automaticamente a partir do cadastro</span></div>
+</body></html>`;
+  const w=window.open('','_blank','width=1100,height=750');
+  if(!w){toast('Permita popups para imprimir','error');return;}
+  w.document.write(html);
+  w.document.close();
+  w.onload=()=>setTimeout(()=>w.print(),300);
+  setTimeout(()=>{if(!w.closed)w.print();},800);
+};
+
+// ── LISTA NOMINAL PDF ──
+window.gerarPDFListaBrigada=()=>{
+  const todos=brigAtivosBrigada().sort((a,c)=>{
+    const ord={coordenador:0,chefe:1,lider:2,brigadista:3};
+    return(ord[a.funcao]??3)-(ord[c.funcao]??3)||(a.nome||'').localeCompare(c.nome||'');
+  });
+  if(!todos.length){toast('Cadastre brigadistas primeiro','error');return;}
+  const emp=empresaAtiva||{};
+  const agora=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+  const stTxt={ok:['#16a34a','Válido'],alerta:['#d97706','Vencendo'],vencido:['#dc2626','Vencido'],sem:['#9ca3af','Sem registro']};
+  const linhas=todos.map((b,i)=>{
+    const t=ultTreinoBrigadaNBR(b);
+    const[corT,txtT]=stTxt[getStatusValidade(t?.validade)];
+    const[corA,txtA]=b.aptidao?stTxt[getStatusValidade(b.aptidao)]:['#9ca3af','—'];
+    const fotoCell=b.foto
+      ?`<img src="${b.foto}" style="width:30px;height:30px;border-radius:50%;object-fit:cover">`
+      :`<div style="width:30px;height:30px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#6b7280">${(b.nome||'?').split(' ').filter(w=>w.length>1).slice(0,2).map(w=>w[0]).join('').toUpperCase()}</div>`;
+    return`<tr>
+      <td style="text-align:center">${i+1}</td>
+      <td>${fotoCell}</td>
+      <td><strong>${b.nome||'—'}</strong>${(b.status||'ativo')==='afastado'?' <span style="color:#9ca3af;font-size:10px">(afastado)</span>':''}</td>
+      <td>${FUNCOES_BRIG[b.funcao]||'Brigadista'}</td>
+      <td>${b.setor||'—'}</td>
+      <td>${b.turno||'—'}</td>
+      <td>${b.tel||'—'}</td>
+      <td>${t?fmtDia(t.data):'—'}</td>
+      <td style="color:${corT};font-weight:600">${t?.validade?fmtDia(t.validade):txtT}</td>
+      <td style="color:${corA};font-weight:600">${b.aptidao?fmtDia(b.aptidao):'—'}</td>
+    </tr>`;
+  }).join('');
+  const logoHtml=emp.logo
+    ?`<img src="${emp.logo}" style="width:52px;height:52px;object-fit:contain;border-radius:8px">`
+    :`<div style="width:52px;height:52px;background:#ff4d1c;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:26px">🔥</div>`;
+  const html=`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
+<title>Brigada de Incêndio — ${emp.nome||''}</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  @page{size:A4 landscape;margin:12mm;}
+  body{font-family:'Segoe UI',Arial,sans-serif;color:#111;background:#fff;font-size:12px;}
+  .cab{display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid #ff4d1c;padding-bottom:12px;margin-bottom:16px;}
+  .cab-emp{display:flex;align-items:center;gap:12px;}
+  .cab h1{font-size:17px;}
+  .cab .sub{font-size:11px;color:#6b7280;}
+  .tit{text-align:right;}
+  .tit .t1{font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;}
+  .tit .t2{font-size:11px;color:#6b7280;}
+  table{width:100%;border-collapse:collapse;}
+  th{background:#f9fafb;border:1px solid #e5e7eb;padding:7px 8px;font-size:9.5px;text-transform:uppercase;letter-spacing:.4px;color:#6b7280;text-align:left;}
+  td{border:1px solid #e5e7eb;padding:6px 8px;font-size:11px;vertical-align:middle;}
+  tr{break-inside:avoid;}
+  .rodape{margin-top:34px;display:flex;gap:40px;justify-content:center;break-inside:avoid;}
+  .ass{text-align:center;font-size:11px;color:#374151;width:260px;}
+  .ass .lin{border-top:1px solid #9ca3af;margin-bottom:4px;padding-top:4px;}
+  .ft{margin-top:18px;display:flex;justify-content:space-between;font-size:9px;color:#9ca3af;border-top:1px solid #e5e7eb;padding-top:6px;}
+</style></head><body>
+<div class="cab">
+  <div class="cab-emp">${logoHtml}<div><h1>${emp.nome||'—'}</h1><div class="sub">${emp.cnpj?'CNPJ: '+emp.cnpj:''}${emp.cidade?' · '+emp.cidade+(emp.estado?'/'+emp.estado:''):''}</div></div></div>
+  <div class="tit"><div class="t1">Relação Nominal da Brigada de Incêndio</div><div class="t2">NBR 14276 · Emitido em ${agora} · ${todos.length} brigadista(s)</div></div>
+</div>
+<table>
+  <thead><tr><th style="width:26px">#</th><th style="width:40px">Foto</th><th>Nome</th><th>Função</th><th>Setor</th><th>Turno</th><th>Telefone</th><th>Últ. Treinamento</th><th>Validade Brigada</th><th>Aptidão Física</th></tr></thead>
+  <tbody>${linhas}</tbody>
+</table>
+<div class="rodape">
+  <div class="ass"><div style="height:40px"></div><div class="lin"></div>Responsável pela Brigada</div>
+  <div class="ass"><div style="height:40px"></div><div class="lin"></div>Responsável pela Empresa</div>
+</div>
+<div class="ft"><span>FireGuard — Gestão de Brigada de Incêndio</span><span>Documento gerado em ${new Date().toLocaleString('pt-BR')}</span></div>
+</body></html>`;
+  const w=window.open('','_blank','width=1100,height=750');
+  if(!w){toast('Permita popups para gerar o PDF','error');return;}
+  w.document.write(html);
+  w.document.close();
+  w.onload=()=>setTimeout(()=>w.print(),300);
+  setTimeout(()=>{if(!w.closed)w.print();},800);
+};
+// ═══════════════ FIM BRIGADA ═══════════════
 
 // ── QR CODES ──
 window.renderQRCodes=()=>{
