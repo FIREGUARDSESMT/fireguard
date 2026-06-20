@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="dark">
+<html lang="pt-BR" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -619,15 +619,15 @@ button[title]:hover::before{content:'';position:absolute;bottom:calc(100% + 1px)
       <div class="nav-item" id="nav-empresas" onclick="nav('empresas',this)"><span>🏢</span> Empresas</div>
       <div class="nav-item" id="nav-equipamentos" onclick="nav('equipamentos',this)"><span>🧯</span> Equipamentos</div>
       <div class="nav-item" id="nav-inspecao" onclick="nav('inspecao',this)"><span>✅</span> Inspeção</div>
-      <div class="nav-item" id="nav-brigada" onclick="nav('brigada',this)"><span>🚒</span> Brigada</div>
       <div class="nav-item" id="nav-relatorios" onclick="nav('relatorios',this)"><span>📄</span> Relatórios</div>
+      <div class="nav-item" id="nav-brigada" onclick="nav('brigada',this)"><span>🚒</span> Brigada</div>
       <div class="nav-item" id="nav-qrcodes" onclick="nav('qrcodes',this)"><span>📱</span> QR Codes</div>
     </div>
     <!-- Theme toggle -->
     <div class="theme-toggle" onclick="toggleTheme()">
-      <span id="themeIcon">☀️</span>
+      <span id="themeIcon">🌙</span>
       <span style="flex:1;font-size:12px">Modo claro</span>
-      <div class="toggle-track" id="toggleTrack"><div class="toggle-thumb"></div></div>
+      <div class="toggle-track on" id="toggleTrack"><div class="toggle-thumb"></div></div>
     </div>
     <div class="sidebar-footer">
       <div class="user-info">
@@ -1972,7 +1972,9 @@ window.nav=(page,el)=>{
 window.toggleTheme=()=>{
   const html=document.documentElement;
   const isDark=html.getAttribute('data-theme')==='dark';
-  html.setAttribute('data-theme',isDark?'light':'dark');
+  const newTheme=isDark?'light':'dark';
+  html.setAttribute('data-theme',newTheme);
+  localStorage.setItem('fg-theme',newTheme);
   const track=document.getElementById('toggleTrack');
   const icon=document.getElementById('themeIcon');
   if(isDark){track.classList.add('on');icon.textContent='🌙';}
@@ -1980,6 +1982,17 @@ window.toggleTheme=()=>{
   // Atualizar charts com novo tema
   setTimeout(()=>{if(empresaAtiva)renderDashboard();},100);
 };
+// Restaurar tema salvo (padrão: claro)
+(()=>{
+  const saved=localStorage.getItem('fg-theme')||'light';
+  document.documentElement.setAttribute('data-theme',saved);
+  const track=document.getElementById('toggleTrack');
+  const icon=document.getElementById('themeIcon');
+  if(track&&icon){
+    if(saved==='light'){track.classList.add('on');icon.textContent='🌙';}
+    else{track.classList.remove('on');icon.textContent='☀️';}
+  }
+})();
 
 // ── DASHBOARD ──
 window.renderDashboard=()=>{
@@ -3159,8 +3172,63 @@ window.renderChecklist=()=>{
         </div>
         <div class="progress-bar"><div class="progress-fill ${nc===0?'green':''}" style="width:${pct}%"></div></div>
       </div>
+      <!-- CONFIRMAÇÃO DE VALIDADES -->
+      ${renderValidadeBox(q)}
       ${checklistAtivo.map(ci=>renderItem(ci,st[ci.id])).join('')}
     </div>`;
+};
+window.renderValidadeBox=(q)=>{
+  if(!inspAtual)return'';
+  const vs=inspState[q.id]||{};
+  const vInsp=q.dataInsp?fmtVencInsp(q.dataInsp):'—';
+  const vRec=q.dataRecarga?fmtVencRecarga(q.dataRecarga):'—';
+  const confirmInsp=vs._validadeInspOk;
+  const confirmRec=vs._validadeRecOk;
+  const novaInsp=vs._novaVencInsp||'';
+  const novaRec=vs._novaVencRec||'';
+  return`<div style="background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);border-radius:12px;padding:16px 20px;margin-bottom:0">
+    <div style="font-size:12px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px">📅 Confirmar Validades Cadastradas</div>
+    <!-- INSPEÇÃO -->
+    <div style="margin-bottom:12px">
+      <div style="font-size:13px;font-weight:600;margin-bottom:6px">Vencimento de Inspeção registrado: <strong style="color:var(--accent)">${vInsp}</strong></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <button class="btn btn-sm ${confirmInsp===true?'btn-green':'btn-ghost'}" onclick="confirmarValidade('insp',true)">✓ Confirmo, está correto</button>
+        <button class="btn btn-sm ${confirmInsp===false?'btn-red':'btn-ghost'}" onclick="confirmarValidade('insp',false)">✕ Está diferente</button>
+      </div>
+      ${confirmInsp===false?`<div style="margin-top:10px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:12px">
+        <div style="font-size:11px;font-weight:600;color:var(--red);margin-bottom:6px">Informe o novo vencimento de inspeção:</div>
+        <input type="date" class="form-input" style="max-width:200px;font-size:13px" value="${novaInsp}" onchange="setNovaValidade('insp',this.value)">
+      </div>`:''}
+    </div>
+    <!-- RECARGA -->
+    <div>
+      <div style="font-size:13px;font-weight:600;margin-bottom:6px">Vencimento de Recarga registrado: <strong style="color:var(--accent)">${q.dataRecarga?vRec:'<span style=\'color:var(--muted)\'>Não cadastrada</span>'}</strong></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <button class="btn btn-sm ${confirmRec===true?'btn-green':'btn-ghost'}" onclick="confirmarValidade('rec',true)">✓ Confirmo, está correto</button>
+        <button class="btn btn-sm ${confirmRec===false?'btn-red':'btn-ghost'}" onclick="confirmarValidade('rec',false)">✕ Está diferente</button>
+      </div>
+      ${confirmRec===false?`<div style="margin-top:10px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:12px">
+        <div style="font-size:11px;font-weight:600;color:var(--red);margin-bottom:6px">Informe o novo vencimento de recarga:</div>
+        <input type="date" class="form-input" style="max-width:200px;font-size:13px" value="${novaRec}" onchange="setNovaValidade('rec',this.value)">
+      </div>`:''}
+    </div>
+  </div>`;
+};
+window.confirmarValidade=(tipo,ok)=>{
+  if(!inspAtual)return;
+  if(tipo==='insp'){
+    inspState[inspAtual.id]._validadeInspOk=ok;
+    if(ok)inspState[inspAtual.id]._novaVencInsp='';
+  } else {
+    inspState[inspAtual.id]._validadeRecOk=ok;
+    if(ok)inspState[inspAtual.id]._novaVencRec='';
+  }
+  renderChecklist();
+};
+window.setNovaValidade=(tipo,val)=>{
+  if(!inspAtual)return;
+  if(tipo==='insp')inspState[inspAtual.id]._novaVencInsp=val;
+  else inspState[inspAtual.id]._novaVencRec=val;
 };
 window.renderItem=(ci,s)=>{
   const ncArea=s.status==='nc'?`
@@ -3477,6 +3545,16 @@ window.confirmarInsp=async(comRecarga)=>{
   const today=new Date().toISOString().split('T')[0];
   const updates={dataInsp:today};
   if(comRecarga)updates.dataRecarga=today;
+  // Aplicar novas validades se o inspetor informou datas diferentes
+  const vs=inspState[q.id]||{};
+  if(vs._validadeInspOk===false&&vs._novaVencInsp){
+    updates.dataInsp=vs._novaVencInsp;
+  }
+  if(vs._validadeRecOk===false&&vs._novaVencRec){
+    updates.dataRecarga=vs._novaVencRec;
+  } else if(comRecarga){
+    updates.dataRecarga=today;
+  }
   setSyncing(true);
   await updateDoc(doc(db,'equipamentos',q.id),updates);
   const ncItems=checklistAtivo.filter(ci=>st[ci.id].status==='nc');
