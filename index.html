@@ -771,6 +771,7 @@ button[title]:hover::before{content:'';position:absolute;bottom:calc(100% + 1px)
         <span id="selecaoCount" style="font-size:13px;font-weight:600;color:var(--red)">0 selecionado(s)</span>
         <div style="flex:1"></div>
         <button class="btn btn-ghost btn-sm" onclick="desmarcarTodos()">✕ Desmarcar todos</button>
+        <button class="btn btn-blue btn-sm" onclick="abrirEditMassa()">📅 Editar datas</button>
         <button class="btn btn-red btn-sm" onclick="excluirSelecionados()">🗑 Excluir selecionados</button>
       </div>
       <div class="table-card">
@@ -1382,6 +1383,61 @@ button[title]:hover::before{content:'';position:absolute;bottom:calc(100% + 1px)
 </div>
 
 <!-- MODAL RELATÓRIO DE NÃO CONFORMIDADES -->
+
+<!-- MODAL EDIÇÃO EM MASSA DE DATAS -->
+<div class="modal-overlay" id="modalEditMassa">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-head">
+      <div class="modal-title">📅 Editar Datas em Massa</div>
+      <button class="modal-close" onclick="fecharModal('modalEditMassa')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="massaResumo" style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:13px;color:var(--blue);font-weight:600"></div>
+
+      <!-- INSPEÇÃO -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div style="font-size:13px;font-weight:700">🔍 Data da Última Inspeção</div>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:var(--muted)">
+            <input type="checkbox" id="massaAtivarInsp" onchange="toggleMassaField('insp')" style="accent-color:var(--accent);width:15px;height:15px">
+            Alterar
+          </label>
+        </div>
+        <div id="massaInspField" style="display:none">
+          <input type="date" class="form-input" id="massaDataInsp">
+          <div style="font-size:11px;color:var(--muted);margin-top:6px">O vencimento da inspeção será recalculado automaticamente (60 dias após esta data).</div>
+        </div>
+        <div id="massaInspInfo" style="font-size:12px;color:var(--muted)">Marque "Alterar" para definir uma nova data de inspeção para todos os selecionados.</div>
+      </div>
+
+      <!-- RECARGA -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:20px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div style="font-size:13px;font-weight:700">🔄 Data da Última Recarga</div>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:var(--muted)">
+            <input type="checkbox" id="massaAtivarRec" onchange="toggleMassaField('rec')" style="accent-color:var(--accent);width:15px;height:15px">
+            Alterar
+          </label>
+        </div>
+        <div id="massaRecField" style="display:none">
+          <input type="date" class="form-input" id="massaDataRec">
+          <div style="font-size:11px;color:var(--muted);margin-top:6px">O vencimento da recarga será recalculado automaticamente (12 meses após esta data).</div>
+        </div>
+        <div id="massaRecInfo" style="font-size:12px;color:var(--muted)">Marque "Alterar" para definir uma nova data de recarga para todos os selecionados.</div>
+      </div>
+
+      <div id="massaAviso" style="display:none;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:10px;padding:12px 16px;font-size:12px;color:var(--yellow);margin-bottom:16px">
+        ⚠️ Esta ação irá sobrescrever as datas existentes de todos os extintores selecionados. Verifique antes de confirmar.
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-ghost" onclick="fecharModal('modalEditMassa')">Cancelar</button>
+        <button class="btn btn-primary" onclick="confirmarEditMassa()" id="massaConfirmarBtn">✓ Aplicar a todos</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modalRelNC">
   <div class="modal" style="max-width:520px">
     <div class="modal-head">
@@ -2413,6 +2469,63 @@ function atualizarBarraSel(){
     const ca=document.getElementById('checkAll');if(ca)ca.checked=false;
   }
 }
+window.abrirEditMassa=()=>{
+  const count=equipSelecionados.size;
+  if(!count)return;
+  document.getElementById('massaResumo').textContent=`📦 ${count} extintor(es) selecionado(s) serão alterados`;
+  // Reset campos
+  document.getElementById('massaAtivarInsp').checked=false;
+  document.getElementById('massaAtivarRec').checked=false;
+  document.getElementById('massaInspField').style.display='none';
+  document.getElementById('massaRecField').style.display='none';
+  document.getElementById('massaInspInfo').style.display='block';
+  document.getElementById('massaRecInfo').style.display='block';
+  document.getElementById('massaAviso').style.display='none';
+  // Data padrão = hoje
+  const today=new Date().toISOString().split('T')[0];
+  document.getElementById('massaDataInsp').value=today;
+  document.getElementById('massaDataRec').value=today;
+  abrirModal('modalEditMassa');
+};
+window.toggleMassaField=(tipo)=>{
+  const ativado=document.getElementById(`massaAtivar${tipo==='insp'?'Insp':'Rec'}`).checked;
+  document.getElementById(`massa${tipo==='insp'?'Insp':'Rec'}Field`).style.display=ativado?'block':'none';
+  document.getElementById(`massa${tipo==='insp'?'Insp':'Rec'}Info`).style.display=ativado?'none':'block';
+  const algumAtivo=document.getElementById('massaAtivarInsp').checked||document.getElementById('massaAtivarRec').checked;
+  document.getElementById('massaAviso').style.display=algumAtivo?'block':'none';
+};
+window.confirmarEditMassa=async()=>{
+  const ativarInsp=document.getElementById('massaAtivarInsp').checked;
+  const ativarRec=document.getElementById('massaAtivarRec').checked;
+  if(!ativarInsp&&!ativarRec){toast('Marque pelo menos um campo para alterar','warn');return;}
+  const dataInsp=document.getElementById('massaDataInsp').value;
+  const dataRec=document.getElementById('massaDataRec').value;
+  if(ativarInsp&&!dataInsp){toast('Informe a data de inspeção','error');return;}
+  if(ativarRec&&!dataRec){toast('Informe a data de recarga','error');return;}
+  const ids=[...equipSelecionados];
+  const btn=document.getElementById('massaConfirmarBtn');
+  btn.textContent='Salvando...';btn.disabled=true;
+  setSyncing(true);
+  try{
+    for(const id of ids){
+      const updates={};
+      if(ativarInsp)updates.dataInsp=dataInsp;
+      if(ativarRec)updates.dataRecarga=dataRec;
+      await updateDoc(doc(db,'equipamentos',id),updates);
+    }
+    fecharModal('modalEditMassa');
+    desmarcarTodos();
+    const campos=[];
+    if(ativarInsp)campos.push('inspeção');
+    if(ativarRec)campos.push('recarga');
+    toast(`✓ ${ids.length} extintor(es) atualizados — ${campos.join(' e ')}! ☁️`);
+  }catch(e){
+    toast('Erro ao atualizar: '+e.message,'error');
+  }finally{
+    btn.textContent='✓ Aplicar a todos';btn.disabled=false;
+    setSyncing(false);
+  }
+};
 window.excluirSelecionados=async()=>{
   const ids=[...equipSelecionados];
   if(!ids.length)return;
@@ -4753,7 +4866,7 @@ window.gerarPDFDia=()=>{
   toast('📄 Abrindo PDF do dia!');
 };
 
-['modalTrocarEmpresa','modalUsuario','modalEmpresa','modalEquip','modalImport','modalRelInsp','modalEnvioEmail','modalVerInsp','modalRelatorioDia','modalRelNC','modalEnvioRelNC'].forEach(id=>{
+['modalTrocarEmpresa','modalUsuario','modalEmpresa','modalEquip','modalImport','modalRelInsp','modalEnvioEmail','modalVerInsp','modalRelatorioDia','modalRelNC','modalEnvioRelNC','modalEditMassa'].forEach(id=>{
   document.getElementById(id).addEventListener('click',e=>{if(e.target===e.currentTarget)fecharModal(id);});
 });
 </script>
