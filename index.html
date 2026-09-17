@@ -380,8 +380,9 @@ button[title]:hover::before{content:'';position:absolute;bottom:calc(100% + 1px)
   box-shadow:0 -4px 20px var(--shadow);}
 .mobile-nav-inner{display:flex;justify-content:space-around;align-items:center;}
 .mobile-nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;
-  padding:6px 10px;border-radius:10px;cursor:pointer;transition:all .2s;
-  font-size:10px;color:var(--muted);min-width:52px;}
+  padding:6px 6px;border-radius:10px;cursor:pointer;transition:all .2s;
+  font-size:9.5px;color:var(--muted);min-width:44px;flex:1;text-align:center;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .mobile-nav-item.active{color:var(--accent);}
 .mobile-nav-item .mn-icon{font-size:20px;line-height:1;}
 
@@ -439,6 +440,59 @@ button[title]:hover::before{content:'';position:absolute;bottom:calc(100% + 1px)
   #selecaoBar{flex-wrap:wrap;gap:8px;}
   #selecaoBar > div{width:100%;display:flex;gap:8px;}
   #selecaoBar > div .btn{flex:1;justify-content:center;}
+
+  /* ── TABELAS VIRAM CARDS (sem rolagem lateral, sem corte) ── */
+  .table-card{overflow-x:visible;background:transparent;border:none;border-radius:0;}
+  .table-card table,.table-card .equip-table{display:block;width:100%;min-width:0!important;table-layout:auto;}
+  .table-card colgroup{display:none;}
+  .table-card thead{display:none;}
+  .table-card tbody{display:block;}
+  .table-card tr{display:block;background:var(--card);border:1px solid var(--border);border-radius:14px;
+    padding:6px 14px;margin-bottom:10px;}
+  .table-card tr:hover td{background:transparent;}
+  .table-card td{display:flex;align-items:center;justify-content:space-between;gap:14px;
+    padding:9px 0;border-top:1px solid var(--border);white-space:normal;overflow:visible;
+    text-overflow:clip;font-size:13px;text-align:right;}
+  .table-card tr td:first-child{border-top:none;}
+  .table-card td::before{content:attr(data-label);font-size:10px;font-weight:600;color:var(--muted);
+    text-transform:uppercase;letter-spacing:.5px;flex-shrink:0;text-align:left;}
+  .table-card td:not([data-label])::before{content:none;}
+  .table-card td[data-label=""]::before{content:none;}
+  .table-card td[colspan]{display:block;text-align:center;}
+  .table-card td[colspan]::before{content:none;}
+  /* Coluna de ações e checkbox ocupam a linha inteira */
+  .table-card td.td-acoes,.table-card td.td-check{justify-content:flex-end;gap:8px;}
+  .table-card td.td-check{justify-content:space-between;}
+  .table-card td.td-acoes .btn{padding:7px 14px!important;font-size:13px!important;}
+
+  /* Organograma: colunas viram uma só */
+  .org-grupo,.org-grupo.wide{flex:1 1 100%;max-width:100%;min-width:0;}
+  .org-filhos-grid{grid-template-columns:1fr!important;}
+  .org-node{max-width:100%;width:100%;}
+  #orgChart > div{min-width:0!important;}
+
+  /* Filtros empilham */
+  .filter-bar{flex-direction:column;align-items:stretch;gap:8px;}
+  .filter-bar .form-input,.filter-bar .search-input{max-width:100%!important;width:100%;}
+
+  /* Grids de 3 colunas nos relatórios */
+  .grid-3-resp{grid-template-columns:1fr 1fr!important;}
+
+  /* Abas roláveis sem cortar */
+  .rel-tab{padding:8px 12px;font-size:12px;white-space:nowrap;}
+  #painel-brig-lista,#painel-brig-org{min-width:0;}
+
+  /* Chips de empresa não estouram */
+  .empresa-chip{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+  /* Evita qualquer estouro horizontal da página */
+  body{overflow-x:hidden;}
+  .main{max-width:100vw;}
+}
+
+@media(max-width:480px){
+  .grid-3-resp{grid-template-columns:1fr!important;}
+  .table-card td{font-size:12.5px;}
 }
 
 @media(max-width:400px){
@@ -463,8 +517,10 @@ button[title]:hover::before{content:'';position:absolute;bottom:calc(100% + 1px)
 .org-nome{font-size:13px;font-weight:700;line-height:1.2;}
 .org-funcao{font-size:9px;font-weight:600;letter-spacing:.4px;}
 .org-sub{font-size:10px;color:var(--muted);}
-.org-grupo{flex:1;min-width:230px;max-width:280px;}
+.org-grupo{flex:1 1 240px;min-width:230px;max-width:280px;}
+.org-grupo.wide{flex:1 1 100%;max-width:100%;}
 .org-filhos{border-left:2px solid var(--border);margin-left:18px;padding-left:12px;margin-top:10px;}
+.org-filhos-grid{display:grid;gap:0 10px;}
 
 /* ── PRINT ── */
 @media print {
@@ -854,7 +910,7 @@ button[title]:hover::before{content:'';position:absolute;bottom:calc(100% + 1px)
       </div>
 
       <!-- TABS -->
-      <div style="display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:4px;margin-bottom:24px;width:fit-content">
+      <div class="tab-bar" style="display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:4px;margin-bottom:24px;width:fit-content;max-width:100%;overflow-x:auto">
         <button class="rel-tab active" id="tab-extintores" onclick="trocarTabRel('extintores')">
           🧯 Extintores
         </button>
@@ -941,7 +997,7 @@ button[title]:hover::before{content:'';position:absolute;bottom:calc(100% + 1px)
       </div>
 
       <!-- TABS -->
-      <div style="display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:4px;margin-bottom:24px;width:fit-content">
+      <div class="tab-bar" style="display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:4px;margin-bottom:24px;width:fit-content;max-width:100%;overflow-x:auto">
         <button class="rel-tab active" id="tab-brig-lista" onclick="trocarTabBrig('lista')">👥 Brigadistas</button>
         <button class="rel-tab" id="tab-brig-org" onclick="trocarTabBrig('org')">🌳 Organograma</button>
       </div>
@@ -1026,6 +1082,9 @@ button[title]:hover::before{content:'';position:absolute;bottom:calc(100% + 1px)
       </div>
       <div class="mobile-nav-item" id="mnav-inspecao" onclick="navMobile('inspecao',this)">
         <span class="mn-icon">✅</span><span>Inspeção</span>
+      </div>
+      <div class="mobile-nav-item" id="mnav-brigada" onclick="navMobile('brigada',this)">
+        <span class="mn-icon">🚒</span><span>Brigada</span>
       </div>
       <div class="mobile-nav-item" id="mnav-relatorios" onclick="navMobile('relatorios',this)">
         <span class="mn-icon">📄</span><span>Relatórios</span>
@@ -1249,12 +1308,17 @@ button[title]:hover::before{content:'';position:absolute;bottom:calc(100% + 1px)
       <input type="hidden" id="bId">
       <input type="hidden" id="bFotoData">
       <div style="display:flex;gap:16px;align-items:center;margin-bottom:18px">
-        <div class="foto-upload" id="bFotoPreview" onclick="document.getElementById('bFotoInput').click()" title="Clique para adicionar foto">📷</div>
+        <div class="foto-upload" id="bFotoPreview" onclick="document.getElementById('bFotoInput').click()" title="Clique para escolher uma foto">📷</div>
         <input type="file" id="bFotoInput" accept="image/*" style="display:none" onchange="lerFotoBrig(event)">
+        <input type="file" id="bFotoCam" accept="image/*" capture="user" style="display:none" onchange="lerFotoBrig(event)">
         <div style="flex:1">
           <div style="font-size:13px;font-weight:600;margin-bottom:4px">Foto do brigadista</div>
           <div style="font-size:12px;color:var(--muted)">Usada no organograma e na lista impressa.</div>
-          <button class="btn btn-ghost btn-sm" id="btnRemoverFotoBrig" onclick="removerFotoBrig()" style="display:none;margin-top:8px">✕ Remover foto</button>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+            <button class="btn btn-ghost btn-sm" onclick="document.getElementById('bFotoCam').click()">📷 Tirar foto</button>
+            <button class="btn btn-ghost btn-sm" onclick="document.getElementById('bFotoInput').click()">🖼 Galeria</button>
+            <button class="btn btn-ghost btn-sm" id="btnRemoverFotoBrig" onclick="removerFotoBrig()" style="display:none">✕ Remover</button>
+          </div>
         </div>
       </div>
       <div class="form-group"><label class="form-label">Nome completo</label><input class="form-input" id="bNome" placeholder="Ex: Carlos Mendes"></div>
@@ -1366,9 +1430,11 @@ button[title]:hover::before{content:'';position:absolute;bottom:calc(100% + 1px)
       <div class="form-group"><label class="form-label">Instrutor / Empresa</label><input class="form-input" id="tInstrutor" placeholder="Ex: SOS Treinamentos"></div>
       <div class="form-group">
         <label class="form-label">Certificado (foto opcional)</label>
-        <div style="display:flex;align-items:center;gap:10px">
-          <button class="btn btn-secondary btn-sm" onclick="document.getElementById('tFotoInput').click()">📎 Anexar</button>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-secondary btn-sm" onclick="document.getElementById('tFotoCam').click()">📷 Tirar foto</button>
+          <button class="btn btn-secondary btn-sm" onclick="document.getElementById('tFotoInput').click()">🖼 Galeria</button>
           <input type="file" id="tFotoInput" accept="image/*" style="display:none" onchange="lerFotoTrein(event)">
+          <input type="file" id="tFotoCam" accept="image/*" capture="environment" style="display:none" onchange="lerFotoTrein(event)">
           <span id="tFotoLabel" style="font-size:12px;color:var(--muted)">Nenhum anexo</span>
         </div>
       </div>
@@ -1694,7 +1760,7 @@ button[title]:hover::before{content:'';position:absolute;bottom:calc(100% + 1px)
     </div>
 
     <!-- Vídeo -->
-    <video id="cameraVideo" style="width:100%;height:100%;object-fit:cover;display:block;transform-origin:center center" playsinline autoplay muted onclick="focarPonto(event)"></video>
+    <video id="cameraVideo" style="width:100%;height:100%;object-fit:contain;background:#000;display:block;transform-origin:center center" playsinline autoplay muted onclick="focarPonto(event)"></video>
 
     <!-- Guia de enquadramento (cantos) -->
     <div style="position:absolute;inset:0;pointer-events:none;display:flex;align-items:center;justify-content:center">
@@ -1806,8 +1872,30 @@ const PERMS_USER=['dashboard','inspecao','equipamentos','brigada','relatorios','
 
 // ── VERSÃO DO SISTEMA ──
 // Ao lançar uma atualização: incremente APP_VERSAO e adicione uma entrada NO TOPO do APP_CHANGELOG.
-const APP_VERSAO='3.1.0';
+const APP_VERSAO='3.3.0';
 const APP_CHANGELOG=[
+  {v:'3.3.0',data:'17/09/2026',titulo:'Responsividade no celular',itens:[
+    'Tabelas viram cards empilhados no celular, com todos os campos visíveis e sem rolagem lateral',
+    'Organograma em coluna única no celular, sem cortar nomes',
+    'Filtros, abas e blocos de relatório se ajustam à largura da tela',
+    'Atalho da Brigada na barra inferior, respeitando as permissões do usuário'
+  ]},
+  {v:'3.2.1',data:'17/09/2026',titulo:'Fotos pela câmera do aparelho',itens:[
+    'No celular, "Tirar foto" abre a câmera nativa do aparelho, com qualidade e lentes originais',
+    'Câmera interna do sistema continua disponível como alternativa, sem abrir ampliada',
+    'Fotos de brigadista e de certificado também com opção de câmera e galeria'
+  ]},
+  {v:'3.2.0',data:'17/09/2026',titulo:'Registro de extintor ausente',itens:[
+    'Botão "Extintor ausente no local" na tela de inspeção, sem precisar preencher o checklist',
+    'Foto do local obrigatória e observação opcional, salvas como não conformidade',
+    'Equipamento fica marcado como ausente nas listas até a próxima inspeção conforme',
+    'Relatórios e PDF adaptados para o caso de ausência'
+  ]},
+  {v:'3.1.1',data:'27/08/2026',titulo:'Organograma em colunas e impressão paginada',itens:[
+    'Setores com muitos brigadistas se distribuem em até 4 colunas, em vez de uma lista vertical',
+    'Impressão quebra páginas sem cortar cards, com blocos de até 32 por página',
+    'Setores grandes ganham página própria com faixa de cabeçalho e marcação de continuação'
+  ]},
   {v:'3.1.0',data:'27/08/2026',titulo:'Melhorias no módulo Brigada',itens:[
     'Novos turnos: Manhã, Tarde, Noite e as combinações Manhã/Tarde, Tarde/Noite e Manhã/Noite',
     'Treinamentos podem ser lançados já na tela de cadastro do brigadista',
@@ -1981,6 +2069,8 @@ function aplicarPermissoes(perms){
   TODAS_PERMS.forEach(p=>{
     const el=document.getElementById('nav-'+p);
     if(el)el.style.display=perms.includes(p)?'':'none';
+    const mel=document.getElementById('mnav-'+p);
+    if(mel)mel.style.display=perms.includes(p)?'':'none';
   });
   const primeiro=TODAS_PERMS.find(p=>perms.includes(p))||'dashboard';
   const navEl=document.getElementById('nav-'+primeiro);
@@ -2232,10 +2322,10 @@ window.renderDashboard=()=>{
   const b=document.getElementById('dashBody');
   b.innerHTML=alertas.length
     ?alertas.map(q=>`<tr>
-        <td><strong>${q.cod}</strong></td><td>${q.tipo}</td><td>${q.local}</td>
-        <td><span style="font-size:12px;background:var(--surface);padding:2px 8px;border-radius:6px">${q._tipoAlerta}</span></td>
-        <td>${q._venc?q._venc.toLocaleDateString('pt-BR',{month:'2-digit',year:'numeric'}):'—'}</td>
-        <td>${badge(q._st)}</td>
+        <td data-label="Código"><strong>${q.cod}</strong></td><td data-label="Tipo">${q.tipo}</td><td data-label="Local">${q.local}</td>
+        <td data-label="Tipo alerta"><span style="font-size:12px;background:var(--surface);padding:2px 8px;border-radius:6px">${q._tipoAlerta}</span></td>
+        <td data-label="Vencimento">${q._venc?q._venc.toLocaleDateString('pt-BR',{month:'2-digit',year:'numeric'}):'—'}</td>
+        <td data-label="Status">${badge(q._st)}</td>
       </tr>`).join('')
     :'<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--muted)">🎉 Todos em dia</td></tr>';
 
@@ -2308,10 +2398,10 @@ window.renderUsuarios=()=>{
         :`<span style="font-size:12px;color:var(--red)">Nenhuma</span>`;
       const isSelf=u.id===currentUser?.uid;
       return`<tr style="${bloqueado?'opacity:.6':''}">
-        <td><strong>${u.nome||'—'}</strong>${isSelf?'<span style="font-size:10px;color:var(--accent);margin-left:6px">● você</span>':''}</td>
-        <td style="color:var(--muted);font-size:12px">${u.email||'—'}</td>
-        <td>${pL}</td><td>${empCount}</td><td>${permCount}</td>
-        <td style="white-space:nowrap;display:flex;gap:6px;padding:10px 14px">
+        <td data-label="Nome"><strong>${u.nome||'—'}</strong>${isSelf?'<span style="font-size:10px;color:var(--accent);margin-left:6px">● você</span>':''}</td>
+        <td data-label="E-mail" style="color:var(--muted);font-size:12px">${u.email||'—'}</td>
+        <td data-label="Perfil">${pL}</td><td data-label="Empresas">${empCount}</td><td data-label="Permissões">${permCount}</td>
+        <td class="td-acoes" data-label="" style="white-space:nowrap;display:flex;gap:6px;padding:10px 14px">
           <button class="btn btn-blue btn-sm" onclick="editarUsuario('${u.id}')" title="Editar">✏</button>
           ${!isSelf?`
           <button class="btn btn-sm ${bloqueado?'btn-green':'btn-ghost'}" 
@@ -2476,9 +2566,9 @@ window.renderEmpresas=()=>{
   const b=document.getElementById('empresasBody');if(!b)return;
   b.innerHTML=empresas.length
     ?empresas.map(e=>`<tr>
-        <td><strong>${e.nome}</strong></td><td>${e.cnpj||'—'}</td>
-        <td>${e.cidade||'—'} - ${e.estado||''}</td><td>${e.resp||'—'}</td>
-        <td>
+        <td data-label="Razão social"><strong>${e.nome}</strong></td><td data-label="CNPJ">${e.cnpj||'—'}</td>
+        <td data-label="Cidade">${e.cidade||'—'} - ${e.estado||''}</td><td data-label="Responsável">${e.resp||'—'}</td>
+        <td class="td-acoes" data-label="">
           <button class="btn btn-ghost btn-sm" onclick="editEmpresa('${e.id}')" title="Editar empresa">✏ Editar</button>
           <button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="delEmpresa('${e.id}')" title="Excluir empresa">🗑</button>
         </td>
@@ -2681,17 +2771,17 @@ window.renderEquipamentos=()=>{
         ?`<span style="${sr==='vencido'?'color:var(--red)':sr==='alerta'?'color:var(--yellow)':''}">${vencRec}</span>`
         :'—';
       return`<tr data-id="${q.id}">
-        <td style="padding:10px 8px 10px 16px"><input type="checkbox" class="equip-check" data-id="${q.id}" onclick="onCheckEquip(this)" style="cursor:pointer;accent-color:var(--accent);width:15px;height:15px"></td>
-        <td><strong style="font-size:12px">${q.cod}</strong></td>
-        <td><span style="font-size:12px;background:var(--surface);padding:2px 6px;border-radius:4px;white-space:nowrap">${q.tipo}</span></td>
-        <td title="${q.local}">${q.local}</td>
-        <td style="text-align:center">${q.cap||'—'}</td>
-        <td style="color:${!q.dataInsp?'var(--muted)':''}">${fmtDate(q.dataInsp)}</td>
-        <td style="color:${q.dataInsp?(getStatus(q.dataInsp)==='vencido'?'var(--red)':getStatus(q.dataInsp)==='alerta'?'var(--yellow)':''):'var(--muted)'}">${fmtVenc(q.dataInsp)}</td>
-        <td style="color:${!q.dataRecarga?'var(--muted)':''}">${recLabel}</td>
-        <td>${recVencLabel}</td>
-        <td class="td-status">${badge(getStatusGeral(q))}</td>
-        <td class="td-acoes" style="padding:8px 10px">
+        <td class="td-check" data-label="Selecionar" style="padding:10px 8px 10px 16px"><input type="checkbox" class="equip-check" data-id="${q.id}" onclick="onCheckEquip(this)" style="cursor:pointer;accent-color:var(--accent);width:15px;height:15px"></td>
+        <td data-label="Código"><strong style="font-size:12px">${q.cod}</strong>${q.ausente?'<div style="font-size:10px;color:var(--red);font-weight:600;margin-top:2px">🚫 Ausente</div>':''}</td>
+        <td data-label="Tipo"><span style="font-size:12px;background:var(--surface);padding:2px 6px;border-radius:4px;white-space:nowrap">${q.tipo}</span></td>
+        <td data-label="Local" title="${q.local}">${q.local}</td>
+        <td data-label="Capacidade" style="text-align:center">${q.cap||'—'}</td>
+        <td data-label="Última inspeção" style="color:${!q.dataInsp?'var(--muted)':''}">${fmtDate(q.dataInsp)}</td>
+        <td data-label="Venc. inspeção" style="color:${q.dataInsp?(getStatus(q.dataInsp)==='vencido'?'var(--red)':getStatus(q.dataInsp)==='alerta'?'var(--yellow)':''):'var(--muted)'}">${fmtVenc(q.dataInsp)}</td>
+        <td data-label="Última recarga" style="color:${!q.dataRecarga?'var(--muted)':''}">${recLabel}</td>
+        <td data-label="Venc. recarga">${recVencLabel}</td>
+        <td class="td-status" data-label="Status">${badge(getStatusGeral(q))}</td>
+        <td class="td-acoes" data-label="" style="padding:8px 10px">
           <button class="btn btn-ghost btn-sm" onclick="editEquip('${q.id}')" style="padding:5px 10px;font-size:13px" title="Editar extintor">✏</button>
         </td>
       </tr>`;
@@ -2823,17 +2913,17 @@ window.renderBrigada=()=>{
       const stApt=getStatusValidade(b.aptidao);
       const afastado=(b.status||'ativo')==='afastado';
       return`<tr style="${afastado?'opacity:.55':''}">
-        <td style="cursor:pointer" onclick="abrirFichaBrig('${b.id}')" title="Abrir ficha">
+        <td data-label="Brigadista" style="cursor:pointer" onclick="abrirFichaBrig('${b.id}')" title="Abrir ficha">
           <span style="display:inline-flex;align-items:center;gap:10px">${avatarBrig(b,32)}<strong style="font-size:12.5px">${b.nome||'—'}</strong>${afastado?'<span class="badge pendente">⏸ Afastado</span>':''}</span>
         </td>
-        <td>${funcaoBadgeBrig(b.funcao)}</td>
-        <td title="${b.setor||''}">${b.setor||'—'}</td>
-        <td style="color:var(--muted)">${b.turno||'—'}</td>
-        <td style="color:${t?'':'var(--muted)'}">${t?fmtDia(t.data):'—'}</td>
-        <td style="color:${st==='vencido'?'var(--red)':st==='alerta'?'var(--yellow)':st==='sem'?'var(--muted)':''}">${t?.validade?fmtDia(t.validade):'—'}</td>
-        <td>${b.aptidao?badgeBrig(stApt,b.aptidao):'<span style="color:var(--muted);font-size:12px">—</span>'}</td>
-        <td>${badgeBrig(st,t?.validade)}</td>
-        <td style="padding:8px 10px;overflow:visible">
+        <td data-label="Função">${funcaoBadgeBrig(b.funcao)}</td>
+        <td data-label="Setor" title="${b.setor||''}">${b.setor||'—'}</td>
+        <td data-label="Turno" style="color:var(--muted)">${b.turno||'—'}</td>
+        <td data-label="Últ. treinamento" style="color:${t?'':'var(--muted)'}">${t?fmtDia(t.data):'—'}</td>
+        <td data-label="Validade" style="color:${st==='vencido'?'var(--red)':st==='alerta'?'var(--yellow)':st==='sem'?'var(--muted)':''}">${t?.validade?fmtDia(t.validade):'—'}</td>
+        <td data-label="Aptidão física">${b.aptidao?badgeBrig(stApt,b.aptidao):'<span style="color:var(--muted);font-size:12px">—</span>'}</td>
+        <td data-label="Status">${badgeBrig(st,t?.validade)}</td>
+        <td class="td-acoes" data-label="" style="padding:8px 10px;overflow:visible">
           <button class="btn btn-ghost btn-sm" onclick="abrirFichaBrig('${b.id}')" style="padding:5px 9px;font-size:13px" title="Ficha e treinamentos">👁</button>
           <button class="btn btn-ghost btn-sm" onclick="editBrigadista('${b.id}')" style="padding:5px 9px;font-size:13px" title="Editar brigadista">✏</button>
         </td>
@@ -2853,7 +2943,7 @@ window.abrirModalBrigadista=()=>{
   document.getElementById('bStatus').value='ativo';
   document.getElementById('bFotoPreview').innerHTML='📷';
   document.getElementById('btnRemoverFotoBrig').style.display='none';
-  document.getElementById('bFotoInput').value='';
+  document.getElementById('bFotoInput').value='';document.getElementById('bFotoCam').value='';
   window._brigTreinsPend=[];renderTreinsPend();toggleTreinFormCad(false);
   abrirModal('modalBrigadista');
 };
@@ -2916,7 +3006,7 @@ window.removerFotoBrig=()=>{
   document.getElementById('bFotoData').value='';
   document.getElementById('bFotoPreview').innerHTML='📷';
   document.getElementById('btnRemoverFotoBrig').style.display='none';
-  document.getElementById('bFotoInput').value='';
+  document.getElementById('bFotoInput').value='';document.getElementById('bFotoCam').value='';
 };
 window.salvarBrigadista=async()=>{
   const id=document.getElementById('bId').value;
@@ -2967,7 +3057,7 @@ window.editBrigadista=id=>{
   document.getElementById('bFotoData').value=b.foto||'';
   document.getElementById('bFotoPreview').innerHTML=b.foto?`<img src="${b.foto}">`:'📷';
   document.getElementById('btnRemoverFotoBrig').style.display=b.foto?'inline-flex':'none';
-  document.getElementById('bFotoInput').value='';
+  document.getElementById('bFotoInput').value='';document.getElementById('bFotoCam').value='';
   fecharFichaBrig();
   abrirModal('modalBrigadista');
 };
@@ -3061,7 +3151,7 @@ window.abrirModalTrein=bid=>{
   document.getElementById('tBrigId').value=bid;
   ['tData','tValidade','tCarga','tCert','tInstrutor'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('tTipo').value='Reciclagem de Brigada (NBR 14276)';
-  document.getElementById('tFotoInput').value='';
+  document.getElementById('tFotoInput').value='';document.getElementById('tFotoCam').value='';
   document.getElementById('tFotoLabel').textContent='Nenhum anexo';
   window._treinFoto=null;
   abrirModal('modalTrein');
@@ -3147,19 +3237,29 @@ window.renderOrganograma=()=>{
   if(chefes.length){html+=linhaCentro(chefes,'nivel-top','var(--accent)');}
   if(chefes.length&&(grupos.length||semLider.length))html+='<div class="org-vline" style="height:18px"></div>';
   html+=`<div style="display:flex;justify-content:center;gap:16px;flex-wrap:wrap;align-items:flex-start">`;
-  html+=grupos.map(g=>`<div class="org-grupo">${node(g.lider,'nivel-lider','var(--blue)')}<div class="org-filhos">${g.filhos.length?g.filhos.map(mini).join(''):'<div style="font-size:11px;color:var(--muted);padding:4px 0">Sem brigadistas neste setor</div>'}</div></div>`).join('');
+  // Bloco de grupo: distribui filhos em várias colunas quando são muitos
+  const COL_MAX=10; // brigadistas por coluna
+  const blocoGrupo=(cabecalho,filhos,vazioMsg)=>{
+    const n=filhos.length;
+    const cols=n>COL_MAX?Math.min(4,Math.ceil(n/COL_MAX)):1;
+    const wide=cols>1;
+    const conteudo=n
+      ?`<div class="org-filhos-grid" style="grid-template-columns:repeat(${cols},minmax(200px,1fr))">${filhos.map(mini).join('')}</div>`
+      :`<div style="font-size:11px;color:var(--muted);padding:4px 0">${vazioMsg||'Sem brigadistas neste setor'}</div>`;
+    return`<div class="org-grupo ${wide?'wide':''}">${cabecalho}<div class="org-filhos">${conteudo}</div></div>`;
+  };
+  html+=grupos.map(g=>blocoGrupo(node(g.lider,'nivel-lider','var(--blue)'),g.filhos)).join('');
   if(semLider.length){
     // Distribuir por setor, em colunas, como se cada setor tivesse um líder
     const porSetor={};
     semLider.forEach(b=>{const k=(b.setor||'').trim()||'Sem setor';(porSetor[k]=porSetor[k]||[]).push(b);});
-    html+=Object.keys(porSetor).sort((a,c)=>a.localeCompare(c)).map(setor=>`
-      <div class="org-grupo">
-        <div class="org-node" style="border-style:dashed">
+    html+=Object.keys(porSetor).sort((a,c)=>a.localeCompare(c)).map(setor=>{
+      const cab=`<div class="org-node" style="border-style:dashed">
           <span class="brig-iniciais" style="width:42px;height:42px;border:1px dashed var(--border);background:transparent">📍</span>
           <div><div class="org-nome">${setor}</div><div class="org-sub">${porSetor[setor].length} brigadista(s)</div></div>
-        </div>
-        <div class="org-filhos">${porSetor[setor].map(mini).join('')}</div>
-      </div>`).join('');
+        </div>`;
+      return blocoGrupo(cab,porSetor[setor]);
+    }).join('');
   }
   html+='</div></div>';
   el.innerHTML=html;
@@ -3182,18 +3282,41 @@ window.imprimirOrganograma=()=>{
   if(coord.length&&(chefes.length||grupos.length||semLider.length))corpo+='<div class="ovline"></div>';
   if(chefes.length)corpo+=linha(chefes,'#ff4d1c');
   if(chefes.length&&(grupos.length||semLider.length))corpo+='<div class="ovline"></div>';
-  corpo+='<div class="ogrupos">';
-  corpo+=grupos.map(g=>`<div class="ogrupo">${nodeP(g.lider,'#3b82f6')}<div class="ofilhos">${g.filhos.map(miniP).join('')||'<div style="font-size:10px;color:#9ca3af;padding:4px 0">Sem brigadistas neste setor</div>'}</div></div>`).join('');
+  // ── Montagem paginada ──
+  // Cada bloco cabe numa página: no máximo 4 colunas × 8 brigadistas = 32 por bloco.
+  const POR_COL=8, MAX_COL=4, POR_BLOCO=POR_COL*MAX_COL, LIMITE_PAG1=16;
+  const blocosDe=(tituloFn,itens)=>{
+    if(!itens.length)return[`<div class="ogrupo">${tituloFn(false)}<div class="ofilhos"><div style="font-size:10px;color:#9ca3af;padding:4px 0">Sem brigadistas neste setor</div></div></div>`];
+    const out=[];
+    for(let i=0;i<itens.length;i+=POR_BLOCO){
+      const parte=itens.slice(i,i+POR_BLOCO);
+      const cols=Math.min(MAX_COL,Math.ceil(parte.length/POR_COL));
+      out.push(`<div class="ogrupo${cols>1?' wide':''}">${tituloFn(i>0)}<div class="ofilhos"><div class="ofgrid" style="grid-template-columns:repeat(${cols},minmax(185px,1fr))">${parte.map(miniP).join('')}</div></div></div>`);
+    }
+    return out;
+  };
+  const bandaSecao=titulo=>`<div class="secao-head"><span>${emp.nome||''} — Organograma da Brigada</span><span class="secao-tit">${titulo}</span></div>`;
+  const pequenos=[],grandes=[];
+  grupos.forEach(g=>{
+    const titFn=cont=>nodeP(g.lider,'#3b82f6')+(cont?'<div class="cont">continuação</div>':'');
+    const alvo=g.filhos.length>LIMITE_PAG1?grandes:pequenos;
+    alvo.push({nome:g.lider.setor||g.lider.nome,blocos:blocosDe(titFn,g.filhos)});
+  });
   if(semLider.length){
     const porSetorP={};
     semLider.forEach(b=>{const k=(b.setor||'').trim()||'Sem setor';(porSetorP[k]=porSetorP[k]||[]).push(b);});
-    corpo+=Object.keys(porSetorP).sort((a,c)=>a.localeCompare(c)).map(setor=>`
-      <div class="ogrupo">
-        <div class="onode" style="border-style:dashed;border-color:#d1d5db"><div class="onome">📍 ${setor}</div><div class="osub">${porSetorP[setor].length} brigadista(s)</div></div>
-        <div class="ofilhos">${porSetorP[setor].map(miniP).join('')}</div>
-      </div>`).join('');
+    Object.keys(porSetorP).sort((a,c)=>a.localeCompare(c)).forEach(setor=>{
+      const lst=porSetorP[setor];
+      const titFn=cont=>`<div class="onode" style="border-style:dashed;border-color:#d1d5db"><div class="onome">📍 ${setor}</div><div class="osub">${lst.length} brigadista(s)${cont?' · continuação':''}</div></div>`;
+      (lst.length>LIMITE_PAG1?grandes:pequenos).push({nome:setor,blocos:blocosDe(titFn,lst)});
+    });
   }
-  corpo+='</div>';
+  // Página 1: hierarquia + setores pequenos
+  corpo+=`<div class="ogrupos">${pequenos.map(g=>g.blocos.join('')).join('')}</div>`;
+  // Páginas seguintes: um setor grande por seção
+  grandes.forEach(g=>{
+    corpo+=`<div class="secao">${bandaSecao(g.nome)}<div class="ogrupos">${g.blocos.join('')}</div></div>`;
+  });
   const logoHtml=emp.logo
     ?`<img src="${emp.logo}" style="width:52px;height:52px;object-fit:contain;border-radius:8px">`
     :`<div style="width:52px;height:52px;background:#ff4d1c;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:26px">🔥</div>`;
@@ -3217,8 +3340,14 @@ window.imprimirOrganograma=()=>{
   .osub{font-size:10px;color:#6b7280;margin-top:2px;}
   .ovline{width:2px;height:16px;background:#d1d5db;margin:0 auto;}
   .ogrupos{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;align-items:flex-start;margin-top:4px;}
-  .ogrupo{min-width:200px;max-width:240px;break-inside:avoid;}
+  .ogrupo{min-width:200px;max-width:240px;break-inside:avoid;page-break-inside:avoid;}
+  .ogrupo.wide{max-width:100%;flex:0 0 auto;}
   .ofilhos{border-left:2px solid #e5e7eb;margin-left:16px;padding-left:10px;margin-top:8px;}
+  .ofgrid{display:grid;gap:0 10px;align-items:start;}
+  .cont{font-size:9px;color:#9ca3af;text-align:center;margin-top:3px;}
+  .secao{page-break-before:always;break-before:page;padding-top:4px;}
+  .secao-head{display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid #ff4d1c;padding-bottom:6px;margin-bottom:14px;font-size:10px;color:#6b7280;}
+  .secao-tit{font-size:12px;font-weight:800;color:#111;text-transform:uppercase;letter-spacing:.5px;}
   .omini{display:flex;align-items:center;gap:8px;border:1px solid #e5e7eb;border-radius:8px;padding:5px 8px;margin-bottom:5px;break-inside:avoid;}
   .rodape{margin-top:28px;display:flex;gap:40px;justify-content:center;break-inside:avoid;}
   .ass{text-align:center;font-size:11px;color:#374151;width:260px;}
@@ -3608,6 +3737,7 @@ window.renderCards=()=>{
         <div class="equip-card-name">${q.tipo} — ${q.cap||''}</div>
         <div class="equip-card-loc">📍 ${q.local}</div>
         <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
+          ${q.ausente?'<span class="badge vencido" style="font-size:11px">🚫 Ausente no local</span>':''}
           ${badge(getStatus(q.dataInsp))}
           ${q.dataRecarga?`<span class="badge ${sr}" style="font-size:11px">🔄 Recarga: ${sr==='ok'?'Ok':sr==='alerta'?'Alerta':'Vencida'}</span>`:'<span class="badge alerta" style="font-size:11px">🔄 Sem recarga</span>'}
         </div>
@@ -3618,6 +3748,7 @@ window.renderCards=()=>{
 window.selecionarEquip=id=>{
   inspAtual=equipamentos.find(q=>q.id===id);
   if(!inspState[id]){inspState[id]={};CHECKLIST.forEach(ci=>inspState[id][ci.id]={status:null,foto:null,obs:''});}
+  if(!inspState[id].ausente)inspState[id].ausente={status:null,foto:null,obs:''};
   // Abrir tela fullscreen de inspeção
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-inspecao-form').classList.add('active');
@@ -3638,6 +3769,49 @@ window.renderChecklist=()=>{
   if(camStreamAtual)fecharCameraFS();
   const q=inspAtual;if(!q)return;
   const st=inspState[q.id];
+  if(!st.ausente)st.ausente={status:null,foto:null,obs:''};
+  // ── MODO: EXTINTOR AUSENTE NO LOCAL ──
+  if(st._semExtintor===true){
+    const a=st.ausente;
+    document.getElementById('checklistPanel').innerHTML=`
+      <div class="checklist">
+        <div class="checklist-header">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+            <div>
+              <div style="font-family:var(--font-head);font-size:16px;font-weight:700">${q.cod} — ${q.tipo}</div>
+              <div style="font-size:13px;color:var(--muted)">📍 ${q.local}</div>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="toggleSemExtintor(false)">← Voltar ao checklist</button>
+          </div>
+        </div>
+        <div style="padding:20px 24px">
+          <div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:12px;padding:16px 20px;margin-bottom:20px">
+            <div style="font-size:15px;font-weight:700;color:var(--red);margin-bottom:4px">🚫 Extintor ausente no local</div>
+            <div style="font-size:13px;color:var(--muted)">O checklist não precisa ser preenchido. Registre a foto do local onde o extintor deveria estar — isso será salvo como não conformidade.</div>
+          </div>
+          <div style="margin-bottom:18px">
+            <div style="font-size:11px;font-weight:600;color:var(--red);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Foto do local <span>*obrigatório</span></div>
+            ${a.foto
+              ?`<div style="position:relative;display:inline-block;width:100%">
+                  <img src="${a.foto}" style="width:100%;max-height:240px;object-fit:cover;border-radius:8px;border:1px solid var(--border);display:block">
+                  <button onclick="removerFoto('ausente')" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.6);color:white;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center">✕</button>
+                </div>
+                <div style="font-size:12px;color:var(--green);margin-top:6px">✓ Foto registrada</div>`
+              :`${botoesFoto('ausente')}`}
+          </div>
+          <div style="margin-bottom:22px">
+            <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">Observação (opcional)</div>
+            <input class="form-input" style="font-size:13px" placeholder="Ex: suporte vazio, extintor retirado para recarga, local em obra..."
+              value="${(a.obs||'').replace(/"/g,'&quot;')}" oninput="setObs('ausente',this.value)">
+          </div>
+          <div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap">
+            <button class="btn btn-ghost" onclick="toggleSemExtintor(false)">Cancelar</button>
+            <button class="btn btn-red" onclick="finalizarAusente()">🚫 Registrar ausência</button>
+          </div>
+        </div>
+      </div>`;
+    return;
+  }
   // CO2 não possui manômetro convencional — excluir item c2
   const isCO2=(q.tipo||'').toUpperCase().includes('CO2')||(q.tipo||'').includes('CO₂');
   const checklistAtivo=CHECKLIST.filter(ci=>!(isCO2&&ci.id==='c2'));
@@ -3659,6 +3833,7 @@ window.renderChecklist=()=>{
           </div>
           <button class="btn btn-primary btn-sm" onclick="finalizarInsp()">✓ Finalizar</button>
         </div>
+        <button class="btn btn-ghost btn-sm" onclick="toggleSemExtintor(true)" style="width:100%;justify-content:center;border-color:rgba(239,68,68,.35);color:var(--red);margin-bottom:12px">🚫 Extintor ausente no local</button>
         <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:4px">
           <span>Progresso: ${done}/${total}</span>
           <span style="color:${nc>0?'var(--red)':'var(--green)'}">Não conformes: ${nc}</span>
@@ -3736,11 +3911,7 @@ window.renderItem=(ci,s)=>{
               <button onclick="removerFoto('${ci.id}')" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.6);color:white;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center">✕</button>
             </div>
             <div style="font-size:12px;color:var(--green);margin-top:6px">✓ Foto registrada</div>`
-          :`<div style="display:flex;gap:8px;flex-wrap:wrap">
-              <button class="btn btn-ghost btn-sm" onclick="tirarFotoCamera('${ci.id}')" style="gap:6px">📷 Tirar foto</button>
-              <button class="btn btn-ghost btn-sm" onclick="pickFile('${ci.id}')" style="gap:6px">📁 Escolher arquivo</button>
-              <input type="file" accept="image/*" id="f_${ci.id}" style="display:none" onchange="lerFoto('${ci.id}',event)">
-            </div>`}
+          :`${botoesFoto(ci.id)}`}
 
       </div>
       <!-- OBSERVAÇÃO -->
@@ -3762,9 +3933,77 @@ window.renderItem=(ci,s)=>{
   </div>`;
 }
 window.setItem=(id,v)=>{if(!inspAtual)return;inspState[inspAtual.id][id].status=v;renderChecklist();};
+// ── EXTINTOR AUSENTE NO LOCAL ──
+window.toggleSemExtintor=on=>{
+  if(!inspAtual)return;
+  const st=inspState[inspAtual.id];
+  st._semExtintor=on;
+  if(!on){st.ausente={status:null,foto:null,obs:''};}
+  renderChecklist();
+};
+window.finalizarAusente=async()=>{
+  const q=inspAtual;if(!q)return;
+  const st=inspState[q.id];
+  const a=st.ausente||{};
+  if(!a.foto){toast('A foto do local é obrigatória','error');return;}
+  const today=new Date().toISOString().split('T')[0];
+  setSyncing(true);
+  try{
+    // Não atualiza dataInsp: o extintor não foi inspecionado, foi constatada a ausência
+    await updateDoc(doc(db,'equipamentos',q.id),{ausente:true,ausenteDesde:today,ausenteObs:a.obs||''});
+  }catch(e){console.warn('Erro ao marcar ausência:',e);}
+  const itemAusente={id:'ausente',nome:'Extintor ausente no local',status:'nc',obs:a.obs||'Extintor não localizado no ponto cadastrado',foto:a.foto};
+  const inspDoc={
+    empresaId:empresaAtiva.id,
+    equipamentoId:q.id,
+    cod:q.cod,tipo:q.tipo,local:q.local,cap:q.cap||'',
+    inspector:currentUser?.nome||'—',
+    inspectorId:currentUser?.uid||'',
+    data:today,
+    resultado:'nc',
+    ausente:true,
+    totalItens:1,
+    totalNC:1,
+    comRecarga:false,
+    checklist:[itemAusente],
+    criadoEm:serverTimestamp()
+  };
+  let inspDocId=null;
+  try{
+    const ref=await addDoc(collection(db,'inspecoes'),inspDoc);
+    inspDocId=ref.id;
+  }catch(e){console.warn('Erro ao salvar inspeção:',e);}
+  ultimoRelInsp={q:{...q},st:{ausente:{status:'nc',foto:a.foto,obs:itemAusente.obs}},ncItems:[{id:'ausente',nome:'Extintor ausente no local'}],today,comRecarga:false,inspector:currentUser?.nome||'—',inspDocId,ausente:true};
+  delete inspState[q.id];inspAtual=null;
+  toast('Ausência registrada como não conformidade');
+  document.getElementById('checklistPanel').innerHTML=`
+    <div style="text-align:center;padding:40px 20px">
+      <div style="font-size:56px;margin-bottom:16px">🚫</div>
+      <div style="font-family:var(--font-head);font-size:20px;font-weight:800;margin-bottom:8px">Extintor Ausente Registrado</div>
+      <div style="font-size:14px;color:var(--muted);margin-bottom:28px">${q.cod} — ${q.local}<br>O equipamento ficará marcado como ausente até a próxima inspeção conforme.</div>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-ghost" onclick="voltarInspecao()">← Voltar à lista</button>
+        <button class="btn btn-blue" onclick="abrirRelInsp()">📋 Ver Relatório</button>
+      </div>
+    </div>`;
+};
 window.setObs=(id,v)=>{if(!inspAtual)return;inspState[inspAtual.id][id].obs=v;};
 window.removerFoto=(id)=>{if(!inspAtual)return;inspState[inspAtual.id][id].foto=null;renderChecklist();};
 window.pickFile=id=>document.getElementById('f_'+id)?.click();
+// ── FOTOS: câmera nativa do aparelho como padrão no celular ──
+const IS_MOBILE=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.maxTouchPoints>1&&/Mac/.test(navigator.platform));
+window.tirarFoto=id=>{
+  if(IS_MOBILE){document.getElementById('c_'+id)?.click();}
+  else{tirarFotoCamera(id);}
+};
+window.botoesFoto=id=>`
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+    <button class="btn btn-primary btn-sm" onclick="tirarFoto('${id}')" style="gap:6px">📷 Tirar foto</button>
+    <button class="btn btn-ghost btn-sm" onclick="pickFile('${id}')" style="gap:6px">🖼 Galeria</button>
+    ${IS_MOBILE?`<button class="btn btn-ghost btn-sm" onclick="tirarFotoCamera('${id}')" style="gap:6px" title="Câmera interna do sistema (zoom, lanterna e foco manual)">⚙ Câmera do app</button>`:''}
+    <input type="file" accept="image/*" capture="environment" id="c_${id}" style="display:none" onchange="lerFoto('${id}',event)">
+    <input type="file" accept="image/*" id="f_${id}" style="display:none" onchange="lerFoto('${id}',event)">
+  </div>`;
 
 // ── CÂMERA FULLSCREEN MELHORADA ──
 let camItemAtual=null;
@@ -3831,9 +4070,9 @@ async function iniciarStreamFS(){
   try{
     camStreamAtual=await navigator.mediaDevices.getUserMedia({
       video:{
-        facingMode:camFacingMode,
-        width:{ideal:1920,max:4096},
-        height:{ideal:1080,max:4096},
+        facingMode:{ideal:camFacingMode},
+        width:{ideal:1920},
+        height:{ideal:1080},
       }
     });
     video.srcObject=camStreamAtual;
@@ -3841,6 +4080,17 @@ async function iniciarStreamFS(){
     // Verificar orientação
     const track=camStreamAtual.getVideoTracks()[0];
     const settings=track.getSettings();
+    // Forçar zoom no mínimo — evita abrir "ampliado" em aparelhos com múltiplas lentes
+    try{
+      const c=track.getCapabilities?.();
+      if(c?.zoom){
+        const zMin=c.zoom.min??1;
+        await track.applyConstraints({advanced:[{zoom:zMin}]}).catch(()=>{});
+        camZoom=zMin;
+        const sl=document.getElementById('zoomSlider');
+        if(sl){sl.min=zMin;sl.value=zMin;}
+      }
+    }catch(e){}
     const msg=document.getElementById('camOrientMsg');
     if(msg)msg.textContent=settings.width>settings.height?'⚠️ Vire o celular na vertical para melhor qualidade':'';
     // Torch disponível?
@@ -4098,7 +4348,7 @@ window.confirmarInsp=async(comRecarga)=>{
   const isCO2=(q.tipo||'').toUpperCase().includes('CO2')||(q.tipo||'').includes('CO₂');
   const checklistAtivo=CHECKLIST.filter(ci=>!(isCO2&&ci.id==='c2'));
   const today=new Date().toISOString().split('T')[0];
-  const updates={dataInsp:today};
+  const updates={dataInsp:today,ausente:false};
   if(comRecarga)updates.dataRecarga=today;
   // Aplicar novas validades se o inspetor informou datas diferentes
   const vs=inspState[q.id]||{};
@@ -4156,6 +4406,7 @@ let ultimoRelInsp=null;
 window.abrirRelInsp=()=>{
   if(!ultimoRelInsp)return;
   const {q,st,ncItems,today,comRecarga,inspector}=ultimoRelInsp;
+  const ehAusente=ultimoRelInsp.ausente===true;
   const dataFmt=new Date(today+'T00:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
   const todosOk=ncItems.length===0;
   let html=`
@@ -4168,7 +4419,7 @@ window.abrirRelInsp=()=>{
       <!-- DADOS DO EXTINTOR -->
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:16px">
         <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Equipamento</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+        <div class="grid-3-resp" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
           <div><div style="font-size:11px;color:var(--muted)">Código</div><div style="font-weight:700;font-size:15px;color:var(--accent)">${q.cod}</div></div>
           <div><div style="font-size:11px;color:var(--muted)">Tipo</div><div style="font-weight:600">${q.tipo}</div></div>
           <div><div style="font-size:11px;color:var(--muted)">Capacidade</div><div style="font-weight:600">${q.cap||'—'}</div></div>
@@ -4193,8 +4444,11 @@ window.abrirRelInsp=()=>{
       <!-- CHECKLIST RESUMO -->
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px">
         <div style="padding:12px 16px;border-bottom:1px solid var(--border);font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px">Checklist</div>
-        ${CHECKLIST.map(ci=>{
+        ${ehAusente
+          ?`<div style="padding:16px;font-size:13px;color:var(--red);font-weight:600">🚫 Extintor não localizado no ponto cadastrado — checklist não aplicável.</div>`
+          :CHECKLIST.map(ci=>{
           const s=st[ci.id];
+          if(!s)return'';
           return`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);font-size:13px">
             <span>${ci.nome}</span>
             <span style="font-weight:600;color:${s.status==='ok'?'var(--green)':'var(--red)'}">
@@ -4209,9 +4463,10 @@ window.abrirRelInsp=()=>{
     html+=`<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Não Conformidades</div>`;
     ncItems.forEach(ci=>{
       const s=st[ci.id];
+      if(!s)return;
       html+=`<div style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);border-radius:10px;padding:16px;margin-bottom:12px">
         <div style="font-weight:700;color:var(--red);margin-bottom:4px">✕ ${ci.nome}</div>
-        <div style="font-size:12px;color:var(--muted);margin-bottom:10px">${ci.desc}</div>
+        ${ci.desc?`<div style="font-size:12px;color:var(--muted);margin-bottom:10px">${ci.desc}</div>`:''}
         
         ${s.obs?`<div style="font-size:13px;background:var(--surface);border-radius:6px;padding:10px;margin-bottom:10px"><strong>Observação:</strong> ${s.obs}</div>`:''}
         ${s.foto?`<div style="text-align:center;background:rgba(0,0,0,.06);border-radius:8px;padding:8px;margin-top:8px;"><img src="${s.foto}" style="max-width:100%;width:auto;max-height:220px;height:auto;object-fit:contain;border-radius:8px;border:1px solid var(--border);display:block;margin:0 auto"></div>`:'<div style="font-size:12px;color:var(--muted);font-style:italic">Sem foto registrada</div>'}
@@ -4262,7 +4517,7 @@ window.renderRelInsp=()=>{
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;flex-wrap:wrap">
             <strong style="font-size:14px;color:var(--accent)">${d.cod||'—'}</strong>
             <span style="font-size:12px;background:var(--surface);padding:2px 8px;border-radius:6px">${d.tipo||'—'}</span>
-            <span class="badge ${conforme?'ok':'vencido'}">${conforme?'✓ Conforme':'✕ '+d.totalNc+' NC'}</span>
+            <span class="badge ${conforme?'ok':'vencido'}">${conforme?'✓ Conforme':(d.ausente?'🚫 Ausente no local':'✕ '+d.totalNc+' NC')}</span>
           </div>
           <div style="font-size:13px;color:var(--muted);margin-bottom:2px">📍 ${d.local||'—'}</div>
           <div style="display:flex;gap:16px;font-size:12px;color:var(--muted);flex-wrap:wrap">
@@ -4284,7 +4539,10 @@ window.abrirRelHist=async(id)=>{
   const dataFmt=d.data?new Date(d.data+'T00:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'}):'—';
   const conforme=d.resultado==='conforme';
   const st=normChecklist(d.checklist);
-  const ncItems=CHECKLIST.filter(ci=>st[ci.id]?.status==='nc');
+  const ehAusente=d.ausente===true;
+  const ncItems=ehAusente
+    ?[{id:'ausente',nome:'Extintor ausente no local'}]
+    :CHECKLIST.filter(ci=>st[ci.id]?.status==='nc');
   let html=`<div id="relHistConteudo">
     <div style="background:var(--accent);border-radius:10px;padding:20px 24px;margin-bottom:20px;color:white">
       <div style="font-family:var(--font-head);font-size:20px;font-weight:800;margin-bottom:4px">🧯 Relatório de Inspeção</div>
@@ -4292,7 +4550,7 @@ window.abrirRelHist=async(id)=>{
     </div>
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:14px">
       <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Equipamento</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+      <div class="grid-3-resp" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
         <div><div style="font-size:11px;color:var(--muted)">Código</div><div style="font-weight:700;font-size:15px;color:var(--accent)">${d.cod}</div></div>
         <div><div style="font-size:11px;color:var(--muted)">Tipo</div><div style="font-weight:600">${d.tipo}</div></div>
         <div><div style="font-size:11px;color:var(--muted)">Capacidade</div><div style="font-weight:600">${d.cap||'—'}</div></div>
@@ -4312,7 +4570,9 @@ window.abrirRelHist=async(id)=>{
     </div>
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px">
       <div style="padding:12px 16px;border-bottom:1px solid var(--border);font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px">Checklist</div>
-      ${CHECKLIST.map(ci=>{
+      ${ehAusente
+        ?`<div style="padding:16px;font-size:13px;color:var(--red);font-weight:600">🚫 Extintor não localizado no ponto cadastrado — checklist não aplicável.</div>`
+        :CHECKLIST.map(ci=>{
         const s=st[ci.id];
         const ok=s?.status==='ok';
         return`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);font-size:13px">
@@ -4325,9 +4585,10 @@ window.abrirRelHist=async(id)=>{
     html+=`<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Não Conformidades</div>`;
     ncItems.forEach(ci=>{
       const s=st[ci.id];
+      if(!s)return;
       html+=`<div style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);border-radius:10px;padding:16px;margin-bottom:12px">
         <div style="font-weight:700;color:var(--red);margin-bottom:4px">✕ ${ci.nome}</div>
-        <div style="font-size:12px;color:var(--muted);margin-bottom:8px">${ci.desc}</div>
+        ${ci.desc?`<div style="font-size:12px;color:var(--muted);margin-bottom:8px">${ci.desc}</div>`:''}
         
         ${s.obs?`<div style="font-size:13px;background:var(--surface);border-radius:6px;padding:10px;margin-bottom:8px"><strong>Observação:</strong> ${s.obs}</div>`:''}
         ${s.foto?`<div style="text-align:center;background:rgba(0,0,0,.06);border-radius:8px;padding:8px;margin-top:8px;"><img src="${s.foto}" style="max-width:100%;width:auto;max-height:220px;height:auto;object-fit:contain;border-radius:8px;border:1px solid var(--border);display:block;margin:0 auto"></div>`:'<div style="font-size:12px;color:var(--muted);font-style:italic">Sem foto registrada</div>'}
@@ -4346,13 +4607,17 @@ window.baixarRelHistPDF=()=>{
   if(!relHistAtual)return;
   const d=relHistAtual;
   const st=normChecklist(d.checklist);
-  const ncItems=CHECKLIST.filter(ci=>st[ci.id]?.status==='nc');
+  const ehAusente=d.ausente===true;
+  const ncItems=ehAusente
+    ?[{id:'ausente',nome:'Extintor ausente no local'}]
+    :CHECKLIST.filter(ci=>st[ci.id]?.status==='nc');
   gerarPDFInspecao({
     q:{cod:d.cod,tipo:d.tipo,local:d.local,cap:d.cap||''},
     st, ncItems,
     today:d.data,
     comRecarga:d.comRecarga,
-    inspector:d.inspector||'—'
+    inspector:d.inspector||'—',
+    ausente:ehAusente
   });
 };
 
@@ -4467,12 +4732,12 @@ window.renderRel=()=>{
   const b=document.getElementById('relBody');if(!b)return;
   b.innerHTML=list.length
     ?list.map(q=>`<tr>
-        <td><strong>${q.cod}</strong></td><td>${q.tipo}</td><td>${q.local}</td>
-        <td>${q.cap||'—'}</td><td>${fmtDate(q.dataInsp)}</td>
-        <td>${fmtVenc(q.dataInsp)}</td>
-        <td>${q.dataRecarga?fmtDate(q.dataRecarga):'—'}</td>
-        <td>${fmtVencRecarga(q.dataRecarga)}</td>
-        <td>${badge(getStatusGeral(q))}</td>
+        <td data-label="Código"><strong>${q.cod}</strong></td><td data-label="Tipo">${q.tipo}</td><td data-label="Local">${q.local}</td>
+        <td data-label="Capacidade">${q.cap||'—'}</td><td data-label="Última inspeção">${fmtDate(q.dataInsp)}</td>
+        <td data-label="Venc. inspeção">${fmtVenc(q.dataInsp)}</td>
+        <td data-label="Última recarga">${q.dataRecarga?fmtDate(q.dataRecarga):'—'}</td>
+        <td data-label="Venc. recarga">${fmtVencRecarga(q.dataRecarga)}</td>
+        <td data-label="Status">${badge(getStatusGeral(q))}</td>
       </tr>`).join('')
     :'<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--muted)">Nenhum equipamento</td></tr>';
 };
@@ -4670,7 +4935,10 @@ function gerarPDFInspecao(rel){
   const agora=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
 
   // Monta linhas do checklist com segurança
-  const checkRows=CHECKLIST.map(ci=>{
+  const ehAusentePDF=rel.ausente===true;
+  const checkRows=ehAusentePDF
+    ?`<div class="cl-row"><span>Extintor ausente no local</span><span class="nc-lbl">✕ Checklist não aplicável</span></div>`
+    :CHECKLIST.map(ci=>{
     const s=st&&st[ci.id];
     const ok=s?.status==='ok';
     return`<div class="cl-row">
@@ -4687,7 +4955,7 @@ function gerarPDFInspecao(rel){
       :`<div class="sem-foto">Sem foto registrada</div>`;
     return`<div class="nc-block">
       <div class="nc-tit">✕ ${ci.nome}</div>
-      <div class="nc-desc">${ci.desc}</div>
+      ${ci.desc?`<div class="nc-desc">${ci.desc}</div>`:''}
       ${s?.obs?`<div class="nc-obs"><strong>Obs:</strong> ${s.obs}</div>`:''}
       ${fotoHtml}
     </div>`;
@@ -4907,7 +5175,7 @@ window.abrirEnvioRelatorioDia=()=>{
   document.getElementById('resumoRelatorioDia').innerHTML=`
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:4px">
       <div style="font-size:12px;color:var(--muted);margin-bottom:10px">📅 ${dataFmt} · ${empresaAtiva?.nome||''}</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center">
+      <div class="grid-3-resp" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center">
         <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px">
           <div style="font-size:22px;font-weight:800;color:var(--accent)">${totalInsp}</div>
           <div style="font-size:11px;color:var(--muted)">Inspeções</div>
